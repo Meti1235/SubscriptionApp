@@ -29,24 +29,23 @@ namespace MassEmailSender.App
         public static Subscriber _currentlyLoggedIn;
         public static UserSubscriber _currentUser;
         public static CompanySubscriber _currentCompany;
-        #region
+        #region Seed method
         public static void Seed()
         {
             if (_userSubscribeSrvc.IsDbEmpty() && _companySubscribeSrvc.IsDbEmpty())
             {
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muhamed", LastName = "Sakipi", Username = "meti20", Password = "meti123", FavoriteType = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdCompanies = new List<int> { 4 } });
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muh", LastName = "Sakipi", Username = "meti30", Password = "meti123", FavoriteType = ProductType.Cosmetics, Email = "sakipi.m@outlook.com", Age = 27, Id = 2 });
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muha", LastName = "Sakipi", Username = "meti40", Password = "meti123", FavoriteType = ProductType.Electronics, Email = "sakipi.m@outlook.com", Age = 27, Id = 3 });
-                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentPromotion = ProductType.Food, Id = 4, IdSubscribers = new List<int> { 1, 2, 3 } }); ;
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muhamed", LastName = "Sakipi", Username = "meti20", Password = "meti123", CurrentProduct = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdCompanies = new List<int> { 4 } });
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muh", LastName = "Sakipi", Username = "meti30", Password = "meti123", CurrentProduct = ProductType.Cosmetics, Email = "sakipi.m@outlook.com", Age = 27, Id = 2 });
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muha", LastName = "Sakipi", Username = "meti40", Password = "meti123", CurrentProduct = ProductType.Electronics, Email = "sakipi.m@outlook.com", Age = 27, Id = 3 });
+                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscribers = new List<int> { 1, 2, 3 } }); ;
             }
         }
-        #endregion
+        #endregion 
         static void Main(string[] args)
         {
             Seed();
             while (true)
             {
-
                 if (_currentlyLoggedIn == null)
                 {
                     int loginChoice = _uiSrvc.LogInMenu();
@@ -86,59 +85,15 @@ namespace MassEmailSender.App
                         int registerChoice = _uiSrvc.RegisterMenu();
                         if (registerChoice == 1)
                         {
-                            Console.Clear(); //refactor this into a menue 
-                            UserSubscriber user = new UserSubscriber();
-                            Console.WriteLine("Enter first name:");
-                            user.FirstName = Console.ReadLine();
-                            Console.WriteLine("Enter last name:");
-                            user.LastName = Console.ReadLine();
-                            Console.WriteLine("Enter age:");
-                            user.Age = int.Parse(Console.ReadLine());
-                            Console.WriteLine("Enter email:");
-                            user.Email = Console.ReadLine();
-                            Console.WriteLine("Enter username:");
-                            user.Username = Console.ReadLine();
-                            Console.WriteLine("Enter password:");
-                            user.Password = Console.ReadLine();
-                            Console.Clear();
-                            Console.WriteLine("Enter your favorite product:");
-                            string[] productChoice = Enum.GetNames(typeof(ProductType));
-                            for (int i = 0; i < productChoice.Length; i++)
-                            {
-                                Console.WriteLine($"{i + 1}) {productChoice[i]}");
-                            }
-                            user.FavoriteType = (ProductType)int.Parse(Console.ReadLine()) - 1;
-                            _currentUser = _userSubscribeSrvc.Register(user);
+                            var newUser = _userSubscribeSrvc.CreateEntity(new UserSubscriber());
+                              _currentUser = _userSubscribeSrvc.Register(newUser);
                             if (_currentUser == null) continue;
                             _currentlyLoggedIn = _currentUser;
                         }
                         else
                         {
-                            Console.Clear(); //refactor this into a menue 
-                            CompanySubscriber company = new CompanySubscriber();
-                            Console.WriteLine("Enter first name:");
-                            company.FirstName = Console.ReadLine();
-                            Console.WriteLine("Enter last name:");
-                            company.LastName = Console.ReadLine();
-                            Console.WriteLine("Enter age:");
-                            company.Age = int.Parse(Console.ReadLine());
-                            Console.WriteLine("Enter company name:");
-                            company.CompanyName = Console.ReadLine();
-                            Console.WriteLine("Enter email:");
-                            company.Email = Console.ReadLine();
-                            Console.WriteLine("Enter username:");
-                            company.Username = Console.ReadLine();
-                            Console.WriteLine("Enter password:");
-                            company.Password = Console.ReadLine();
-                            Console.Clear();
-                            Console.WriteLine("Enter your favorite product:");
-                            string[] productChoice = Enum.GetNames(typeof(ProductType));
-                            for (int i = 0; i < productChoice.Length; i++)
-                            {
-                                Console.WriteLine($"{i + 1}) {productChoice[i]}");
-                            }
-                            company.CurrentPromotion = (ProductType)int.Parse(Console.ReadLine()) - 1;
-                            _currentCompany = _companySubscribeSrvc.Register(company);
+                            var newEntity = _companySubscribeSrvc.CreateEntity(new CompanySubscriber());
+                            _currentCompany = _companySubscribeSrvc.Register(newEntity);
                             if (_currentCompany == null) continue;
                             _currentlyLoggedIn = _currentCompany;
                         }

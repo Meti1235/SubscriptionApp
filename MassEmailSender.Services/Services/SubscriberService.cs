@@ -36,10 +36,48 @@ namespace MassEmailSender.Services
             return userFound;
         }
 
+        public T CreateEntity(T entity)
+        {
+
+            Console.Clear(); //refactor this into a menue 
+            Console.WriteLine("Enter first name:");
+            entity.FirstName = Console.ReadLine();
+            Console.WriteLine("Enter last name:");
+            entity.LastName = Console.ReadLine();
+
+            if (entity.GetType().ToString().Contains("CompanySubscriber"))
+            {
+                Console.WriteLine("Enter company name:");
+                entity.CompanyName = Console.ReadLine();
+            } 
+
+            Console.WriteLine("Enter age:");
+            entity.Age = int.Parse(Console.ReadLine());
+            Console.WriteLine("Enter email:");
+            entity.Email = Console.ReadLine();
+            Console.WriteLine("Enter username:");
+            entity.Username = Console.ReadLine();
+            Console.WriteLine("Enter password:");
+            entity.Password = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Enter your favorite product:");
+            string[] productChoice = Enum.GetNames(typeof(ProductType));
+            for (int i = 0; i < productChoice.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}) {productChoice[i]}");
+            }
+            entity.CurrentProduct = (ProductType)int.Parse(Console.ReadLine()) - 1;
+            return entity;
+        }
         public T Register(T entity)
         {
 
-            if (ValidationHelper.ValidateString(entity.FirstName) == null
+
+            if (entity.GetType().ToString().Contains("UserSubscriber"))
+            {
+                entity.CompanyName.Remove(0);
+            }
+                if (ValidationHelper.ValidateString(entity.FirstName) == null
                 || ValidationHelper.ValidateString(entity.LastName) == null
                 || ValidationHelper.ValidateUsername(entity.Username) == null
                 || ValidationHelper.ValidatePassword(entity.Password) == null)
@@ -47,6 +85,7 @@ namespace MassEmailSender.Services
                 MessageHelper.PrintMessage("[Error] Invalid information!", ConsoleColor.Red);
                 return null;
             }
+         
             int id = _db.Insert(entity);
             return _db.GetById(id);
         }

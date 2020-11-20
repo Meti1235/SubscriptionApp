@@ -105,7 +105,7 @@ namespace MassEmailSender.Services
                 for (int i = 0; i < allCompanies.Count; i++)
                 {
                     Console.Write($"{i + 1}) {allCompanies[i].CompanyName} ");
-                    allCompanies[i].ReadPromotion(allCompanies[i].CurrentPromotion);
+                    allCompanies[i].ReadPromotion(allCompanies[i].CurrentProduct);
                 }
 
                 int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), allCompanies.Count);
@@ -156,5 +156,9 @@ namespace MassEmailSender.Services
             }
             Console.ReadLine();
         }
+
     }
+
+
+    
 }

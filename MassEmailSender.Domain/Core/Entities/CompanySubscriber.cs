@@ -6,10 +6,8 @@ namespace MassEmailSender.Domain.Core.Entities
 {
     public class CompanySubscriber : Subscriber
     {
-        public string CompanyName;
         public List<string> SuggestionBox { get; set; }
         public List<string> SubscribedEmails { get; set; }
-        public ProductType CurrentPromotion { get; set; }
         public List<int> IdSubscribers { get; set; }
         public string PromotionText { get; set; }
 
@@ -34,7 +32,7 @@ namespace MassEmailSender.Domain.Core.Entities
             }
             else
             {
-                Console.WriteLine($"(Here at {CompanyName} we provide the latest and best {CurrentPromotion}!)");
+                Console.WriteLine($"(Here at {CompanyName} we provide the latest and best {CurrentProduct}!)");
             }
         }
         public void ReadSuggestions()
@@ -55,7 +53,7 @@ namespace MassEmailSender.Domain.Core.Entities
             Console.WriteLine($"{CompanyName} is sending a promotion");
             Console.WriteLine("Sending....");
             Thread.Sleep(3000);
-            PromotionUserBase(CurrentPromotion);
+            PromotionUserBase(CurrentProduct);
             Console.ReadLine();
         }
     }

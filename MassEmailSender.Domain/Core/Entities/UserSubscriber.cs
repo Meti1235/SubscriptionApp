@@ -6,7 +6,6 @@ namespace MassEmailSender.Domain.Core.Entities
 {
     public class UserSubscriber : Subscriber
     {
-        public ProductType FavoriteType { get; set; }
         public List<int> IdCompanies { get; set; }
         public UserSubscriber()
         {
@@ -20,7 +19,7 @@ namespace MassEmailSender.Domain.Core.Entities
         public override void ReadPromotion(ProductType product)
         {
             Console.WriteLine($"Mr/Mrs: {FirstName}, The product {product} is on sale!"); 
-            if (product == FavoriteType) Console.WriteLine($"Special Promotion with Coupon: ILove{FavoriteType}");
+            if (product == CurrentProduct) Console.WriteLine($"Special Promotion with Coupon: ILove{CurrentProduct}");
         }
     }
 }
