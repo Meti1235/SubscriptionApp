@@ -9,6 +9,7 @@ namespace MassEmailSender.Services
 {
     public class UiService : IUiService
     {
+        public static ISubscriberService<UserSubscriber> _userSubscribeSrvc = new SubscriberService<UserSubscriber>();
         public static ISubscriberService<CompanySubscriber> _companySubscribeSrvc = new SubscriberService<CompanySubscriber>();
         public FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
         public List<string> MainMenuItems { get; set; }
@@ -34,7 +35,50 @@ namespace MassEmailSender.Services
                 return choice;
             }
         }
+        public Subscriber UserRegister()
+        {
+            int registerChoice = RegisterMenu();
+            SubscriptionType role = (SubscriptionType)registerChoice;
+            switch (role)
+            {
+                case SubscriptionType.User:
+                    var newUser = _userSubscribeSrvc.CreateEntity(new UserSubscriber());
+                    var registeredUser = _userSubscribeSrvc.Register(newUser);
+                    return registeredUser;
 
+                case SubscriptionType.Company:
+                    var newCompany = _companySubscribeSrvc.CreateEntity(new CompanySubscriber());
+                    var registeredCompany = _companySubscribeSrvc.Register(newCompany);
+                    return registeredCompany;
+            }
+            return null;
+        }
+        public Subscriber UserLogIn()
+        {
+            int roleChoice = RoleMenu();
+
+            SubscriptionType role = (SubscriptionType)roleChoice;
+
+            Console.Clear();  //refactor this into a menue 
+            Console.WriteLine("Enter username:");
+            string username = Console.ReadLine();
+            Console.WriteLine("Enter password:");
+            string password = Console.ReadLine();
+
+            switch (role)
+            {
+                case SubscriptionType.User:
+                   UserSubscriber _currentUser = _userSubscribeSrvc.LogIn(username, password);
+                    if (_currentUser != null) _currentUser.AddCompaniesAgain();
+                    return _currentUser;
+
+                case SubscriptionType.Company:
+                   CompanySubscriber _currentCompany = _companySubscribeSrvc.LogIn(username, password);
+                    if (_currentCompany != null) _currentCompany.AddSubscribersAgain();
+                    return _currentCompany;
+            }
+            return null;
+        }
         public int LogInMenu()
         {
             List<string> menuItems = new List<string>() { "Log In", "Regsiter" };
@@ -77,35 +121,25 @@ namespace MassEmailSender.Services
             return ChooseMenu(AccountMenuItems);
         }
 
-        public void SendPromotions(CompanySubscriber company)
-        {
-            Console.Clear();
-            Console.WriteLine("promotions!!!");
-            company.SendPromotions();
-
-            Console.ReadLine();
-        }
-
         public void UpgradeToPremium()
         {
             Console.Clear();
             Console.WriteLine("Upgrade to premium to get these features:");
-            Console.WriteLine("* Live trainings");
             Console.WriteLine("* Newsletter in your mail");
-            Console.WriteLine("* Discounts at sports equipment stores");
             Console.ReadLine();
         }
 
-        public int SubscribeMenue(UserSubscriber currentUser)
+        public int SubscribeMenue(Subscriber currentUser)
         {
             while (true)
             {
+                var user = (UserSubscriber)currentUser;
                 Console.Clear();
                 List<CompanySubscriber> allCompanies = _DbCompany.GetAll().ToList();
                 for (int i = 0; i < allCompanies.Count; i++)
                 {
                     Console.Write($"{i + 1}) {allCompanies[i].CompanyName} ");
-                    allCompanies[i].ReadPromotion(allCompanies[i].CurrentProduct);
+                    allCompanies[i].Discription();
                 }
 
                 int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), allCompanies.Count);
@@ -115,7 +149,7 @@ namespace MassEmailSender.Services
                     MessageHelper.PrintMessage("[Error] Input incorrect. Please try again.", ConsoleColor.Red);
                     continue;
                 }
-                currentUser.SubscribesForPromotion(currentCompany);
+                user.SubscribesForPromotion(currentCompany);
                 return choice;
             }
         }

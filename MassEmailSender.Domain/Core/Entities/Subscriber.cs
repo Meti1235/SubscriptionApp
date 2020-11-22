@@ -6,7 +6,6 @@ namespace MassEmailSender.Domain.Core.Entities
 {
     public abstract class Subscriber : BaseEntity, ISubscriber
     {
-        public string CompanyName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
@@ -16,5 +15,7 @@ namespace MassEmailSender.Domain.Core.Entities
         public string Password { get; set; }
         public SubscriptionType Role { get; set; }
         public ProductType CurrentProduct { get; set; }
+        public List<int> IdSubscriptionList { get; set; }
+
     }
 }

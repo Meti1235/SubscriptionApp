@@ -1,4 +1,5 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
+using MassEmailSender.Services;
 using System;
 using System.Collections.Generic;
 
@@ -7,98 +8,93 @@ namespace MassEmailSender.Domain.Core.Services
 
     public static class Subscribe
     {
-        public static void SubscribesForPromotion(this UserSubscriber user, CompanySubscriber company)
+        public static IUiService _uiSrvc = new UiService();
+        private static FileSystemDb<CompanySubscriber> companyDB = new FileSystemDb<CompanySubscriber>();
+        private static FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
+      
+        public static void AddSubscribersAgain(this Subscriber currentCompany)    //create 1 method for both
         {
-            Console.WriteLine("A person susbscribed");
-            FileSystemDb<CompanySubscriber> companyDB = new FileSystemDb<CompanySubscriber>();
-            FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
-
-            company.PromotionUserBase += user.ReadPromotion;
-
-            if (!company.IdSubscribers.Contains(user.Id))
-            {
-                company.IdSubscribers.Add(user.Id);
-                companyDB.Update(company);
-            }
-            if (!user.IdCompanies.Contains(company.Id))
-            {
-                user.IdCompanies.Add(company.Id);
-                userDB.Update(user);
-            }
-
-            Console.ReadLine();
-            company.SubscribedEmails.Add(user.Email);
-        }
-        public static void AddSubscribers(this CompanySubscriber currentCompany)    //create 1 method for both
-        {
-            FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
-
-
-            foreach (int subscriberID in currentCompany.IdSubscribers)
+            
+            foreach (int subscriberID in currentCompany.IdSubscriptionList)
             {
                 UserSubscriber subscriber = userDB.GetById(subscriberID);
-
-                subscriber.SubscribesForPromotion(currentCompany);
+                subscriber.SubscribesForPromotion((CompanySubscriber)currentCompany);
 
             }
-            Console.WriteLine("Subscriptions were added again for the Company");
-            Console.ReadLine();
         }
-        public static void AddCompanies(this UserSubscriber currentUser)     //create 1 method for both
+        public static void AddCompaniesAgain(this Subscriber currentUser)     //create 1 method for both
         {
-            FileSystemDb<CompanySubscriber> userDB = new FileSystemDb<CompanySubscriber>();
-
-
-            foreach (int companiesID in currentUser.IdCompanies)
+            foreach (int companiesID in currentUser.IdSubscriptionList)
             {
-                CompanySubscriber company = userDB.GetById(companiesID);
-                currentUser.SubscribesForPromotion(company);
+                CompanySubscriber company = companyDB.GetById(companiesID);
+                var user = (UserSubscriber)currentUser;
+                user.SubscribesForPromotion(company);
             }
-            Console.WriteLine("Subscriptions were added again for the User");
-            Console.ReadLine();
         }
-        public static void EditDiscription(this CompanySubscriber currentCompany)
-        {
-            FileSystemDb<CompanySubscriber> userDB = new FileSystemDb<CompanySubscriber>();
 
-            Console.WriteLine("Edit your Discription");
+        public static void EditDiscription(this Subscriber currentCompany)
+        {
+            Console.WriteLine("Edit your Discription:");
+            var company = (CompanySubscriber)currentCompany;
             string discription = Console.ReadLine();
 
-            currentCompany.PromotionText = $"( {discription} )";
-            userDB.Update(currentCompany);
+            company.PromotionText = $"({discription})";
+            companyDB.Update(company);
+            Console.Clear();
             Console.WriteLine("Discription Updated.");
+            Console.ReadLine();
         }
 
-        public static void UserSubscriptionList(this UserSubscriber currentUser)
-        {
-            FileSystemDb<CompanySubscriber> userDB = new FileSystemDb<CompanySubscriber>();
-            var companyList = new List<CompanySubscriber>();
 
-            foreach (int companiesID in currentUser.IdCompanies)
+        public static void MySusbscriptionList(this Subscriber currentUser)
+        {
+            var companyList = new List<CompanySubscriber>();
+            Console.Clear();
+            Console.WriteLine("Your company subcriptions: ");
+            foreach (int companiesID in currentUser.IdSubscriptionList)
             {
-                CompanySubscriber company = userDB.GetById(companiesID);
+                CompanySubscriber company = companyDB.GetById(companiesID);
                 companyList.Add(company);
-                Console.WriteLine(company.CompanyName);
+                Console.Write($"{company.CompanyName}");
+                company.Discription();
             }
-       
+            Console.ReadLine();
+           
+        }
+        public static void SubscribesForPromotion(this UserSubscriber user, CompanySubscriber company)
+        {
+
+            company.PromotionUserBase += user.ReadPromotion;
+            Console.WriteLine("A person susbscribed");
+
+
+            if (!company.IdSubscriptionList.Contains(user.Id))
+            {
+                company.IdSubscriptionList.Add(user.Id);
+                companyDB.Update(company);
+            }
+            if (!user.IdSubscriptionList.Contains(company.Id))
+            {
+                user.IdSubscriptionList.Add(company.Id);
+                userDB.Update(user);
+            }
+            company.SubscribedEmails.Add(user.Email);
             Console.ReadLine();
         }
         public static void UnsubscribesForPromotion(this UserSubscriber user, CompanySubscriber company, string reason)
         {
             Console.WriteLine("A person unsubscribed");
-            FileSystemDb<CompanySubscriber> companyDB = new FileSystemDb<CompanySubscriber>();
-            FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
 
             company.PromotionUserBase -= user.ReadPromotion;
 
-            if (company.IdSubscribers.Contains(user.Id))
+            if (company.IdSubscriptionList.Contains(user.Id))
             {
-                company.IdSubscribers.Remove(user.Id);
+                company.IdSubscriptionList.Remove(user.Id);
                 companyDB.Update(company);
             }
-            if (user.IdCompanies.Contains(company.Id))
+            if (user.IdSubscriptionList.Contains(company.Id))
             {
-                user.IdCompanies.Remove(company.Id);
+                user.IdSubscriptionList.Remove(company.Id);
                 userDB.Update(user);
             }
             company.SuggestionBox.Add(reason);

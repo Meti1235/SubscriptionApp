@@ -1,4 +1,5 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
+using MassEmailSender.Domain.Core.Services;
 using MassEmailSender.Services.Helpers;
 using System;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MassEmailSender.Services
         {
             _db = new FileSystemDb<T>();
         }
-
+    
         public T GetUserById(int id)
         {
             // Security question, Check token, Check authentication, Check if it's logged in
@@ -38,27 +39,32 @@ namespace MassEmailSender.Services
 
         public T CreateEntity(T entity)
         {
-
-            Console.Clear(); //refactor this into a menue 
+            Console.Clear();
             Console.WriteLine("Enter first name:");
             entity.FirstName = Console.ReadLine();
+
             Console.WriteLine("Enter last name:");
             entity.LastName = Console.ReadLine();
 
             if (entity.GetType().ToString().Contains("CompanySubscriber"))
             {
-                Console.WriteLine("Enter company name:");
-                entity.CompanyName = Console.ReadLine();
-            } 
+                Console.WriteLine("Enter company name");
+                CompanySubscriber companySubscriber = (CompanySubscriber)(Subscriber)entity;
+                companySubscriber.CompanyName = Console.ReadLine();
+            }
 
             Console.WriteLine("Enter age:");
             entity.Age = int.Parse(Console.ReadLine());
+
             Console.WriteLine("Enter email:");
             entity.Email = Console.ReadLine();
+
             Console.WriteLine("Enter username:");
             entity.Username = Console.ReadLine();
+
             Console.WriteLine("Enter password:");
             entity.Password = Console.ReadLine();
+
             Console.Clear();
             Console.WriteLine("Enter your favorite product:");
             string[] productChoice = Enum.GetNames(typeof(ProductType));
@@ -67,25 +73,20 @@ namespace MassEmailSender.Services
                 Console.WriteLine($"{i + 1}) {productChoice[i]}");
             }
             entity.CurrentProduct = (ProductType)int.Parse(Console.ReadLine()) - 1;
+
             return entity;
         }
         public T Register(T entity)
         {
-
-
-            if (entity.GetType().ToString().Contains("UserSubscriber"))
-            {
-                entity.CompanyName.Remove(0);
-            }
-                if (ValidationHelper.ValidateString(entity.FirstName) == null
-                || ValidationHelper.ValidateString(entity.LastName) == null
-                || ValidationHelper.ValidateUsername(entity.Username) == null
-                || ValidationHelper.ValidatePassword(entity.Password) == null)
+            if (ValidationHelper.ValidateString(entity.FirstName) == null
+            || ValidationHelper.ValidateString(entity.LastName) == null
+            || ValidationHelper.ValidateUsername(entity.Username) == null
+            || ValidationHelper.ValidatePassword(entity.Password) == null)
             {
                 MessageHelper.PrintMessage("[Error] Invalid information!", ConsoleColor.Red);
                 return null;
             }
-         
+
             int id = _db.Insert(entity);
             return _db.GetById(id);
         }
@@ -126,10 +127,10 @@ namespace MassEmailSender.Services
             MessageHelper.PrintMessage("Password successfuly changed!", ConsoleColor.Green);
             Console.ReadLine();
         }
-
         public bool IsDbEmpty()
         {
             return _db.GetAll() == null || _db.GetAll().Count == 0;
         }
+
     }
 }

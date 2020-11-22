@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace MassEmailSender.Domain.Core.Entities
 {
@@ -46,13 +44,13 @@ namespace MassEmailSender.Domain.Core.Entities
         {
             using (StreamReader sr = new StreamReader(_dbPath))
             {
-       
+
                 List<T> allData = GetAll();
                 return allData.SingleOrDefault(x => x.Id == id);
             }
         }
 
-       
+
         public int Insert(T entity)
         {
             List<T> data = new List<T>();
@@ -61,7 +59,7 @@ namespace MassEmailSender.Domain.Core.Entities
                 data = JsonConvert.DeserializeObject<List<T>>(sr.ReadToEnd());
             }
             if (data == null) data = new List<T>();
-            entity.Id = GenerateId(); 
+            entity.Id = GenerateId();
             data.Add(entity);
             WriteData(_dbPath, data);
             return entity.Id;

@@ -27,17 +27,16 @@ namespace MassEmailSender.App
         public static ISubscriberService<UserSubscriber> _userSubscribeSrvc = new SubscriberService<UserSubscriber>();
         public static ISubscriberService<CompanySubscriber> _companySubscribeSrvc = new SubscriberService<CompanySubscriber>();
         public static Subscriber _currentlyLoggedIn;
-        public static UserSubscriber _currentUser;
-        public static CompanySubscriber _currentCompany;
+
         #region Seed method
         public static void Seed()
         {
             if (_userSubscribeSrvc.IsDbEmpty() && _companySubscribeSrvc.IsDbEmpty())
             {
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muhamed", LastName = "Sakipi", Username = "meti20", Password = "meti123", CurrentProduct = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdCompanies = new List<int> { 4 } });
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muhamed", LastName = "Sakipi", Username = "meti20", Password = "meti123", CurrentProduct = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdSubscriptionList = new List<int> { 4 } });
                 _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muh", LastName = "Sakipi", Username = "meti30", Password = "meti123", CurrentProduct = ProductType.Cosmetics, Email = "sakipi.m@outlook.com", Age = 27, Id = 2 });
                 _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muha", LastName = "Sakipi", Username = "meti40", Password = "meti123", CurrentProduct = ProductType.Electronics, Email = "sakipi.m@outlook.com", Age = 27, Id = 3 });
-                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscribers = new List<int> { 1, 2, 3 } }); ;
+                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscriptionList = new List<int> { 1, 2, 3 } }); ;
             }
         }
         #endregion 
@@ -52,52 +51,14 @@ namespace MassEmailSender.App
 
                     if (loginChoice == 1)
                     {
-                        int roleChoice = _uiSrvc.RoleMenu();
-
-                        SubscriptionType role = (SubscriptionType)roleChoice;
-
-                        Console.Clear();  //refactor this into a menue 
-                        Console.WriteLine("Enter username:");
-                        string username = Console.ReadLine();
-                        Console.WriteLine("Enter password:");
-                        string password = Console.ReadLine();
-
-                        switch (role)
-                        {
-                            case SubscriptionType.User:
-                                _currentUser = _userSubscribeSrvc.LogIn(username, password);
-                                _currentlyLoggedIn = _currentUser;
-                                _currentUser.AddCompanies();
-                                break;
-                            case SubscriptionType.Company:
-
-                                _currentCompany = _companySubscribeSrvc.LogIn(username, password);
-                                _currentCompany.AddSubscribers();
-                                _currentlyLoggedIn = _currentCompany;
-
-                                break;
-                        }
-
-                        if (_currentlyLoggedIn == null) continue;
+                        _currentlyLoggedIn = _uiSrvc.UserLogIn();
                     }
                     else
                     {
-                        int registerChoice = _uiSrvc.RegisterMenu();
-                        if (registerChoice == 1)
-                        {
-                            var newUser = _userSubscribeSrvc.CreateEntity(new UserSubscriber());
-                              _currentUser = _userSubscribeSrvc.Register(newUser);
-                            if (_currentUser == null) continue;
-                            _currentlyLoggedIn = _currentUser;
-                        }
-                        else
-                        {
-                            var newEntity = _companySubscribeSrvc.CreateEntity(new CompanySubscriber());
-                            _currentCompany = _companySubscribeSrvc.Register(newEntity);
-                            if (_currentCompany == null) continue;
-                            _currentlyLoggedIn = _currentCompany;
-                        }
+                        _currentlyLoggedIn = _uiSrvc.UserRegister();
+                       
                     }
+                    if (_currentlyLoggedIn == null) continue;
                     _uiSrvc.Welcome(_currentlyLoggedIn);
                 }
 
@@ -106,22 +67,22 @@ namespace MassEmailSender.App
                 switch (mainMenuItem)
                 {
                     case "Promotion Discription":
-                        _currentCompany.EditDiscription();
+                        _currentlyLoggedIn.EditDiscription();
                         break;
                     case "Market Offers":
-                        _uiSrvc.SubscribeMenue(_currentUser);
+                        _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
                         Console.WriteLine("You succesfully Subscribed");
                         Console.ReadLine();
                         break;
                     case "Send Promotions":
-                        _currentCompany.SendPromotions();
-
+                       var compamy = (CompanySubscriber)_currentlyLoggedIn;
+                        compamy.SendPromotions();
                         break;
                     case "Upgrade to Premium":
                         _uiSrvc.UpgradeToPremium();
                         break;
                     case "Your Subscriptions":  //refactor this into a menue 
-                        _currentUser.UserSubscriptionList();
+                        _currentlyLoggedIn.MySusbscriptionList();
                         break;
                     case "Account":
                         int accountChoice = _uiSrvc.AccountMenu(_currentlyLoggedIn.Role);

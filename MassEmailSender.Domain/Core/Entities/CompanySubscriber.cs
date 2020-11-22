@@ -6,9 +6,9 @@ namespace MassEmailSender.Domain.Core.Entities
 {
     public class CompanySubscriber : Subscriber
     {
+        public string CompanyName { get; set; }
         public List<string> SuggestionBox { get; set; }
         public List<string> SubscribedEmails { get; set; }
-        public List<int> IdSubscribers { get; set; }
         public string PromotionText { get; set; }
 
         public CompanySubscriber()
@@ -16,7 +16,7 @@ namespace MassEmailSender.Domain.Core.Entities
             Role = SubscriptionType.Company;
             SuggestionBox = new List<string>();
             SubscribedEmails = new List<string>();
-            IdSubscribers = new List<int>();
+            IdSubscriptionList = new List<int>();
             PromotionText = null;
         }
 
@@ -24,7 +24,7 @@ namespace MassEmailSender.Domain.Core.Entities
         {
             return $"{FirstName} {LastName} created a profile for {CompanyName}";
         }
-        public override void ReadPromotion(ProductType product)
+        public void Discription()
         {
             if (PromotionText != null)
             {
@@ -48,12 +48,19 @@ namespace MassEmailSender.Domain.Core.Entities
         public event PromotionSender PromotionUserBase;
         public void SendPromotions()
         {
-
+            Console.Clear();
             Console.WriteLine("---------------");
             Console.WriteLine($"{CompanyName} is sending a promotion");
             Console.WriteLine("Sending....");
             Thread.Sleep(3000);
-            PromotionUserBase(CurrentProduct);
+            if (PromotionUserBase == null)
+            {
+                Console.WriteLine("You have no subscribers");
+            }
+            else
+            {
+                PromotionUserBase(CurrentProduct);
+            }
             Console.ReadLine();
         }
     }

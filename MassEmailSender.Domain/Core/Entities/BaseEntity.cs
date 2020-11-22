@@ -8,6 +8,5 @@ namespace MassEmailSender.Domain.Core.Entities
     {
         public int Id { get; set; }
         public abstract string Info();
-        public abstract void ReadPromotion(ProductType product);
     }
 }

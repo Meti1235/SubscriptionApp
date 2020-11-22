@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MassEmailSender.Domain.Core.Entities
 {
@@ -35,7 +33,7 @@ namespace MassEmailSender.Domain.Core.Entities
         public void RemoveById(int id)
         {
             T item = db.SingleOrDefault(x => x.Id == id);
-            if(item != null) db.Remove(item);
+            if (item != null) db.Remove(item);
         }
 
         public void Update(T entity)
