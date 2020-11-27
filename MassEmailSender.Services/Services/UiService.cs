@@ -1,5 +1,4 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
-using MassEmailSender.Domain.Core.Services;
 using MassEmailSender.Services.Helpers;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace MassEmailSender.Services
         public FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
         public List<string> MainMenuItems { get; set; }
         public List<string> AccountMenuItems { get; set; }
-      
+
         public int ChooseMenu<T>(List<T> items)
         {
             while (true)
@@ -35,7 +34,7 @@ namespace MassEmailSender.Services
                 return choice;
             }
         }
-        public Subscriber UserRegister()
+        public Subscriber UserRegister() //move this method
         {
             int registerChoice = RegisterMenu();
             SubscriptionType role = (SubscriptionType)registerChoice;
@@ -51,9 +50,32 @@ namespace MassEmailSender.Services
                     var registeredCompany = _companySubscribeSrvc.Register(newCompany);
                     return registeredCompany;
             }
-            return null;
+            throw new ApplicationException("This error is not possible");
         }
-        public Subscriber UserLogIn()
+
+        public int PromotionMenue()
+        {
+            List<string> menuItems = new List<string>() { "Send InApp Promotion", "Send Email Promotion" };
+            return ChooseMenu(menuItems);
+        }
+
+        public void SendPromotion(Subscriber currentCompany) //move this method
+        {
+            int promotionChoice = PromotionMenue();
+
+            var compamy = (CompanySubscriber)currentCompany;
+
+            if (promotionChoice == 1)
+            {
+                compamy.SendInAppPromotions();
+            }
+            else
+            {
+                _companySubscribeSrvc.SendEmailPromotion();
+            }
+        }
+
+        public Subscriber UserLogIn()  //move this method
         {
             int roleChoice = RoleMenu();
 
@@ -68,16 +90,16 @@ namespace MassEmailSender.Services
             switch (role)
             {
                 case SubscriptionType.User:
-                   UserSubscriber _currentUser = _userSubscribeSrvc.LogIn(username, password);
+                    UserSubscriber _currentUser = _userSubscribeSrvc.LogIn(username, password);
                     if (_currentUser != null) _currentUser.AddCompaniesAgain();
                     return _currentUser;
 
                 case SubscriptionType.Company:
-                   CompanySubscriber _currentCompany = _companySubscribeSrvc.LogIn(username, password);
+                    CompanySubscriber _currentCompany = _companySubscribeSrvc.LogIn(username, password);
                     if (_currentCompany != null) _currentCompany.AddSubscribersAgain();
                     return _currentCompany;
             }
-            return null;
+            throw new ApplicationException("This error is not possible");
         }
         public int LogInMenu()
         {
@@ -129,11 +151,10 @@ namespace MassEmailSender.Services
             Console.ReadLine();
         }
 
-        public int SubscribeMenue(Subscriber currentUser)
+        public void SubscribeMenue(Subscriber currentUser)
         {
             while (true)
             {
-                var user = (UserSubscriber)currentUser;
                 Console.Clear();
                 List<CompanySubscriber> allCompanies = _DbCompany.GetAll().ToList();
                 for (int i = 0; i < allCompanies.Count; i++)
@@ -149,8 +170,12 @@ namespace MassEmailSender.Services
                     MessageHelper.PrintMessage("[Error] Input incorrect. Please try again.", ConsoleColor.Red);
                     continue;
                 }
+
+                var user = (UserSubscriber)currentUser;
                 user.SubscribesForPromotion(currentCompany);
-                return choice;
+                Console.Clear();
+                Console.WriteLine("You succesfully Subscribed.");
+                Console.ReadLine();
             }
         }
 
@@ -194,5 +219,5 @@ namespace MassEmailSender.Services
     }
 
 
-    
+
 }

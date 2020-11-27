@@ -1,9 +1,8 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
-using MassEmailSender.Services;
 using System;
 using System.Collections.Generic;
 
-namespace MassEmailSender.Domain.Core.Services
+namespace MassEmailSender.Services
 {
 
     public static class Subscribe
@@ -11,24 +10,23 @@ namespace MassEmailSender.Domain.Core.Services
         public static IUiService _uiSrvc = new UiService();
         private static FileSystemDb<CompanySubscriber> companyDB = new FileSystemDb<CompanySubscriber>();
         private static FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
-      
-        public static void AddSubscribersAgain(this Subscriber currentCompany)    //create 1 method for both
+
+        public static void AddSubscribersAgain(this CompanySubscriber currentCompany)    //create 1 method for both
         {
-            
+
             foreach (int subscriberID in currentCompany.IdSubscriptionList)
             {
                 UserSubscriber subscriber = userDB.GetById(subscriberID);
-                subscriber.SubscribesForPromotion((CompanySubscriber)currentCompany);
+                subscriber.SubscribesForPromotion(currentCompany);
 
             }
         }
-        public static void AddCompaniesAgain(this Subscriber currentUser)     //create 1 method for both
+        public static void AddCompaniesAgain(this UserSubscriber currentUser)     //create 1 method for both
         {
-            foreach (int companiesID in currentUser.IdSubscriptionList)
+            foreach (int companiesID in currentUser.IdSubscriptionList) //map or third method
             {
                 CompanySubscriber company = companyDB.GetById(companiesID);
-                var user = (UserSubscriber)currentUser;
-                user.SubscribesForPromotion(company);
+                currentUser.SubscribesForPromotion(company);
             }
         }
 
@@ -59,7 +57,7 @@ namespace MassEmailSender.Domain.Core.Services
                 company.Discription();
             }
             Console.ReadLine();
-           
+
         }
         public static void SubscribesForPromotion(this UserSubscriber user, CompanySubscriber company)
         {

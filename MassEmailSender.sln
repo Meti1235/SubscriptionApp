@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassEmailSender.App", "MassEmailSender.App\MassEmailSender.App.csproj", "{04A14DFE-75CB-403C-8B91-E345FBF5D6AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassEmailSender.App", "MassEmailSender.App\MassEmailSender.App.csproj", "{04A14DFE-75CB-403C-8B91-E345FBF5D6AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassEmailSender.Domain", "MassEmailSender.Domain\MassEmailSender.Domain.csproj", "{2E9F1A29-12D1-4111-8E07-ACF295B4210F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassEmailSender.Domain", "MassEmailSender.Domain\MassEmailSender.Domain.csproj", "{2E9F1A29-12D1-4111-8E07-ACF295B4210F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassEmailSender.Services", "MassEmailSender.Services\MassEmailSender.Services.csproj", "{67EED6F3-B184-4A6F-82E2-321DF1F08003}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassEmailSender.Services", "MassEmailSender.Services\MassEmailSender.Services.csproj", "{67EED6F3-B184-4A6F-82E2-321DF1F08003}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Gmail.v1" Version="1.49.0.2146" />
+    <PackageReference Include="MimeKit" Version="2.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MassEmailSender.Domain\MassEmailSender.Domain.csproj" />
   </ItemGroup>
 

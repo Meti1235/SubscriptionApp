@@ -1,12 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MassEmailSender.Services.Helpers
 {
     public static class ValidationHelper
     {
-
+        public static string ValidateEmail(string email)
+        {
+            if (!email.Contains("@"))
+            {
+                Console.WriteLine("You wrote an Incorrect Email");
+                return null;
+            }
+            Regex regex = new Regex(@"[+].+[@]");
+            string validEmail = regex.Replace(email, "@");
+            return validEmail;
+        }
         public static int ValidateNumber(string number, int range)
         {
             int num = 0;

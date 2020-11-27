@@ -1,26 +1,26 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
-using MassEmailSender.Domain.Core.Services;
 using MassEmailSender.Services;
+using MassEmailSender.Services.GmailAPI;
 using System;
 using System.Collections.Generic;
 
 namespace MassEmailSender.App
 {
 
-    //1. Registraion for 2 accounts types Subscriber/Company DONE*********
+    //1. Registraion for 2 accounts types Subscriber/Company DONE*****
     //2. Login to show 2 different layouts //DONE*****
     //3. Subscriber Layout should show all the companies and option for subscribing  //DONE*****
     //4. Company Layout should give them option to edit their product description and  //DONE*****
     //4.5 Multy Option for sending out advertising to all subscribers DONEish******
-    //5. put users and company in a dictionary inside the comapny db so they can auto subscribe when logging in //DONE******
+    //5. put users and company in a dictionary inside the comapny db so they can auto subscribe when logging in //DONE*****
     //6. add a list of companies which the user is following so they can see all their subscriptions Like 5. above //DONE*****
-    //7. fix the broken subscription for new companies
+    //7. fix the broken subscription for new companies //DONE*****
     //8. create your subscription menue for Users
     //9. Ask the user if they are sure before sending Promotions(write yes/no)
-    //10. Give the option to change the user and company products
+    //10. Give the option to change products to the users and companies
     //11. Give multiple option for Products
-    //12. Add the Unsubscribe option //HALFDONE****
-    //
+    //12. Add the Unsubscribe option //HALFDONE*****
+    //13. Complete the GmailAPI service //HALFDONE*****
     class Program
     {
         public static IUiService _uiSrvc = new UiService();
@@ -39,9 +39,19 @@ namespace MassEmailSender.App
                 _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscriptionList = new List<int> { 1, 2, 3 } }); ;
             }
         }
-        #endregion 
+        #endregion
+
         static void Main(string[] args)
         {
+            //refactor this code
+            //bool wasEmailSent =  Email.SendEmail("Test02", "Hello there. I hope you are having a fun day :)", "proshqipe@gmail.com", "sakipi.m@outlook.com");
+            //  if (!wasEmailSent)
+            //  {
+            //      Console.WriteLine("email was not sent");
+            //  }
+            //  Console.WriteLine("Email was sent");
+            //  Console.ReadLine();
+
             Seed();
             while (true)
             {
@@ -56,7 +66,7 @@ namespace MassEmailSender.App
                     else
                     {
                         _currentlyLoggedIn = _uiSrvc.UserRegister();
-                       
+
                     }
                     if (_currentlyLoggedIn == null) continue;
                     _uiSrvc.Welcome(_currentlyLoggedIn);
@@ -71,17 +81,15 @@ namespace MassEmailSender.App
                         break;
                     case "Market Offers":
                         _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
-                        Console.WriteLine("You succesfully Subscribed");
-                        Console.ReadLine();
+
                         break;
                     case "Send Promotions":
-                       var compamy = (CompanySubscriber)_currentlyLoggedIn;
-                        compamy.SendPromotions();
+                        _uiSrvc.SendPromotion(_currentlyLoggedIn);
                         break;
                     case "Upgrade to Premium":
                         _uiSrvc.UpgradeToPremium();
                         break;
-                    case "Your Subscriptions":  //refactor this into a menue 
+                    case "Your Subscriptions":
                         _currentlyLoggedIn.MySusbscriptionList();
                         break;
                     case "Account":
@@ -130,6 +138,7 @@ namespace MassEmailSender.App
                         break;
                     case "Log Out":
                         _currentlyLoggedIn = null;
+                        //Email.EmptyCredential();
                         break;
                     default:
                         break;

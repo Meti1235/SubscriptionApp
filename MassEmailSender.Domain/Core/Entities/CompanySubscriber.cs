@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Apis.Auth.OAuth2;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -46,7 +47,7 @@ namespace MassEmailSender.Domain.Core.Entities
 
         public delegate void PromotionSender(ProductType product);
         public event PromotionSender PromotionUserBase;
-        public void SendPromotions()
+        public void SendInAppPromotions()
         {
             Console.Clear();
             Console.WriteLine("---------------");

@@ -1,5 +1,6 @@
-﻿using MassEmailSender.Domain.Core.Entities;
-using MassEmailSender.Domain.Core.Services;
+﻿using Google.Apis.Gmail.v1.Data;
+using MassEmailSender.Domain.Core.Entities;
+using MassEmailSender.Services.GmailAPI;
 using MassEmailSender.Services.Helpers;
 using System;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace MassEmailSender.Services
         {
             _db = new FileSystemDb<T>();
         }
-    
+
         public T GetUserById(int id)
         {
             // Security question, Check token, Check authentication, Check if it's logged in
@@ -34,9 +35,42 @@ namespace MassEmailSender.Services
                 MessageHelper.PrintMessage("[Error] Username or Password did not match! Please try again!", ConsoleColor.Red);
                 return null;
             }
+            if (userFound.GetType().ToString().Contains("CompanySubscriber"))
+            {
+                Email.CreateAPICredentials(userFound.Id);
+            }
+           
             return userFound;
         }
+        public Message WriteEmail()
+        {
+            Console.Clear();
+            Console.WriteLine("Please enter the Subject:");
+            string subject = Console.ReadLine();
+            Console.WriteLine("Please write your Gmail");
+            string emailFrom = ValidationHelper.ValidateEmail(Console.ReadLine());
+            Console.WriteLine("Please write the recipient email:");
+            string emailTo = ValidationHelper.ValidateEmail(Console.ReadLine());
+            Console.WriteLine("Please write your message:");
+            string body = Console.ReadLine();
 
+            Message message = Email.CreateMessage(subject, body, emailFrom, emailTo);
+            return message;
+
+        }
+        public void SendEmailPromotion() //write email and store email //would you like to send email Yes/No //Yes sends email //No goes back aka opens the saves string again
+        {
+            Message message = WriteEmail();
+            bool wasEmailSent = Email.SendEmail(message);
+
+            Console.Clear();
+            if (!wasEmailSent)
+            {
+                Console.WriteLine("Your email was not sent.");
+            }
+            Console.WriteLine("Your email was successfully sent.");
+            Console.ReadLine();
+        }
         public T CreateEntity(T entity)
         {
             Console.Clear();
@@ -76,7 +110,7 @@ namespace MassEmailSender.Services
 
             return entity;
         }
-        public T Register(T entity)
+        public T Register(T entity)  //add more validations
         {
             if (ValidationHelper.ValidateString(entity.FirstName) == null
             || ValidationHelper.ValidateString(entity.LastName) == null
@@ -88,6 +122,10 @@ namespace MassEmailSender.Services
             }
 
             int id = _db.Insert(entity);
+            if (entity.GetType().ToString().Contains("CompanySubscriber"))
+            {
+                Email.CreateAPICredentials(id);
+            }
             return _db.GetById(id);
         }
 
