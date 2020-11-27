@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MassEmailSender.Domain.Core.Entities
 {
@@ -17,7 +16,7 @@ namespace MassEmailSender.Domain.Core.Entities
         }
         public void ReadPromotion(ProductType product)
         {
-            Console.WriteLine($"Mr/Mrs: {FirstName}, The product {product} is on sale!"); 
+            Console.WriteLine($"Mr/Mrs: {FirstName}, The product {product} is on sale!");
             if (product == CurrentProduct) Console.WriteLine($"Special Promotion with Coupon: ILove{CurrentProduct}");
         }
     }

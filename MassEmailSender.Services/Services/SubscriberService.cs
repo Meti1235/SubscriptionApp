@@ -39,7 +39,7 @@ namespace MassEmailSender.Services
             {
                 Email.CreateAPICredentials(userFound.Id);
             }
-           
+
             return userFound;
         }
         public Message WriteEmail()

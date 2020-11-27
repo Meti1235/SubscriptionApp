@@ -85,7 +85,6 @@ namespace MassEmailSender.Services.GmailAPI
                   CancellationToken.None,
                   new FileDataStore(credPath, true)).Result;
                     Console.WriteLine("Credential file saved to: " + credPath);
-                    Console.WriteLine(Credential.ToString());
                 }
             }
         }

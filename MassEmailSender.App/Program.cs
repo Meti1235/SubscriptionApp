@@ -1,7 +1,6 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
 using MassEmailSender.Services;
 using MassEmailSender.Services.GmailAPI;
-using System;
 using System.Collections.Generic;
 
 namespace MassEmailSender.App
@@ -73,7 +72,6 @@ namespace MassEmailSender.App
                         break;
                     case "Market Offers":
                         _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
-
                         break;
                     case "Send Promotions":
                         _uiSrvc.SendPromotion(_currentlyLoggedIn);
@@ -85,48 +83,7 @@ namespace MassEmailSender.App
                         _currentlyLoggedIn.MySusbscriptionList();
                         break;
                     case "Account":
-                        int accountChoice = _uiSrvc.AccountMenu(_currentlyLoggedIn.Role);
-                        Console.Clear();
-                        if (accountChoice == 1)
-                        {
-                            // Change Info
-                            Console.WriteLine("Enter new First Name:");
-                            string firstName = Console.ReadLine();
-                            Console.WriteLine("Enter new Last Name:");
-                            string lastName = Console.ReadLine();
-                            switch (_currentlyLoggedIn.Role)
-                            {
-                                case SubscriptionType.User:
-                                    _userSubscribeSrvc.ChangeInfo(_currentlyLoggedIn.Id, firstName, lastName);
-                                    break;
-                                case SubscriptionType.Company:
-                                    _companySubscribeSrvc.ChangeInfo(_currentlyLoggedIn.Id, firstName, lastName);
-                                    break;
-                            }
-                        }
-                        else if (accountChoice == 2)
-                        {
-                            // Check Subscription  
-                            Console.WriteLine($"Your subscription is: {_currentlyLoggedIn.Role}");
-                            Console.ReadLine();
-                        }
-                        else if (accountChoice == 3)
-                        {
-                            // Change Password
-                            Console.WriteLine("Enter old password:");
-                            string oldPass = Console.ReadLine();
-                            Console.WriteLine("Enter new password:");
-                            string newPass = Console.ReadLine();
-                            switch (_currentlyLoggedIn.Role)
-                            {
-                                case SubscriptionType.User:
-                                    _userSubscribeSrvc.ChangePassword(_currentlyLoggedIn.Id, oldPass, newPass);
-                                    break;
-                                case SubscriptionType.Company:
-                                    _companySubscribeSrvc.ChangePassword(_currentlyLoggedIn.Id, oldPass, newPass);
-                                    break;
-                            }
-                        }
+                        _uiSrvc.MyAccountMenue(_currentlyLoggedIn);
                         break;
                     case "Log Out":
                         _currentlyLoggedIn = null;

@@ -21,6 +21,7 @@ namespace MassEmailSender.Services
         Subscriber UserRegister();
         int PromotionMenue();
         void SendPromotion(Subscriber currentCompany);
+        void MyAccountMenue(Subscriber currentUser);
 
     }
 }

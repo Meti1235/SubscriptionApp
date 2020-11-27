@@ -34,6 +34,52 @@ namespace MassEmailSender.Services
                 return choice;
             }
         }
+
+        public void MyAccountMenue(Subscriber currentUser)
+        {
+            int accountChoice = AccountMenu(currentUser.Role);
+            Console.Clear();
+            if (accountChoice == 1)
+            {
+                // Change Info
+                Console.WriteLine("Enter new First Name:");
+                string firstName = Console.ReadLine();
+                Console.WriteLine("Enter new Last Name:");
+                string lastName = Console.ReadLine();
+                switch (currentUser.Role)
+                {
+                    case SubscriptionType.User:
+                        _userSubscribeSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
+                        break;
+                    case SubscriptionType.Company:
+                        _companySubscribeSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
+                        break;
+                }
+            }
+            else if (accountChoice == 2)
+            {
+                // Check Subscription  
+                Console.WriteLine($"Your subscription is: {currentUser.Role}");
+                Console.ReadLine();
+            }
+            else if (accountChoice == 3)
+            {
+                // Change Password
+                Console.WriteLine("Enter old password:");
+                string oldPass = Console.ReadLine();
+                Console.WriteLine("Enter new password:");
+                string newPass = Console.ReadLine();
+                switch (currentUser.Role)
+                {
+                    case SubscriptionType.User:
+                        _userSubscribeSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
+                        break;
+                    case SubscriptionType.Company:
+                        _companySubscribeSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
+                        break;
+                }
+            }
+        }
         public Subscriber UserRegister() //move this method
         {
             int registerChoice = RegisterMenu();
@@ -139,7 +185,7 @@ namespace MassEmailSender.Services
 
         public int AccountMenu(SubscriptionType role)
         {
-            AccountMenuItems = new List<string>() { "Change Info", "Check Subscription", "Change Password" };
+            AccountMenuItems = new List<string>() { "Change UserName", "Check Subscription", "Change Password" };
             return ChooseMenu(AccountMenuItems);
         }
 
