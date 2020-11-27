@@ -64,7 +64,7 @@ namespace MassEmailSender.Services.GmailAPI
               .Replace("=", "");
         }
 
-        public static void EmptyCredential()
+        public static void ClearCredential()
         {
             Credential = null;
         }
@@ -75,7 +75,7 @@ namespace MassEmailSender.Services.GmailAPI
                 using (var stream =
                 new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
                 {
-                    
+
                     string credPath = $".credentials/gmail-dotnet-quickstart{id}.json";
 
                     Credential = GoogleWebAuthorizationBroker.AuthorizeAsync(

@@ -43,14 +43,6 @@ namespace MassEmailSender.App
 
         static void Main(string[] args)
         {
-            //refactor this code
-            //bool wasEmailSent =  Email.SendEmail("Test02", "Hello there. I hope you are having a fun day :)", "proshqipe@gmail.com", "sakipi.m@outlook.com");
-            //  if (!wasEmailSent)
-            //  {
-            //      Console.WriteLine("email was not sent");
-            //  }
-            //  Console.WriteLine("Email was sent");
-            //  Console.ReadLine();
 
             Seed();
             while (true)
@@ -138,7 +130,7 @@ namespace MassEmailSender.App
                         break;
                     case "Log Out":
                         _currentlyLoggedIn = null;
-                        //Email.EmptyCredential();
+                        Email.ClearCredential();
                         break;
                     default:
                         break;
