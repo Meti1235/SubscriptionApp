@@ -9,6 +9,7 @@ namespace MassEmailSender.Services
 {
     public class SubscriberService<T> : ISubscriberService<T> where T : Subscriber
     {
+        public static IUiService _uiSrvc = new UiService();
         private IDb<T> _db;
         public SubscriberService()
         {
@@ -26,51 +27,6 @@ namespace MassEmailSender.Services
             return _db;
         }
 
-        public T LogIn(string username, string password)
-        {
-
-            T userFound = _db.GetAll().SingleOrDefault(x => x.Username == username && x.Password == password);
-            if (userFound == null)
-            {
-                MessageHelper.PrintMessage("[Error] Username or Password did not match! Please try again!", ConsoleColor.Red);
-                return null;
-            }
-            if (userFound.GetType().ToString().Contains("CompanySubscriber"))
-            {
-                Email.CreateAPICredentials(userFound.Id);
-            }
-
-            return userFound;
-        }
-        public Message WriteEmail()
-        {
-            Console.Clear();
-            Console.WriteLine("Please enter the Subject:");
-            string subject = Console.ReadLine();
-            Console.WriteLine("Please write your Gmail");
-            string emailFrom = ValidationHelper.ValidateEmail(Console.ReadLine());
-            Console.WriteLine("Please write the recipient email:");
-            string emailTo = ValidationHelper.ValidateEmail(Console.ReadLine());
-            Console.WriteLine("Please write your message:");
-            string body = Console.ReadLine();
-
-            Message message = Email.CreateMessage(subject, body, emailFrom, emailTo);
-            return message;
-
-        }
-        public void SendEmailPromotion() //write email and store email //would you like to send email Yes/No //Yes sends email //No goes back aka opens the saves string again
-        {
-            Message message = WriteEmail();
-            bool wasEmailSent = Email.SendEmail(message);
-
-            Console.Clear();
-            if (!wasEmailSent)
-            {
-                Console.WriteLine("Your email was not sent.");
-            }
-            Console.WriteLine("Your email was successfully sent.");
-            Console.ReadLine();
-        }
         public T CreateEntity(T entity)
         {
             Console.Clear();
@@ -110,6 +66,7 @@ namespace MassEmailSender.Services
 
             return entity;
         }
+
         public T Register(T entity)  //add more validations
         {
             if (ValidationHelper.ValidateString(entity.FirstName) == null
@@ -124,51 +81,33 @@ namespace MassEmailSender.Services
             int id = _db.Insert(entity);
             if (entity.GetType().ToString().Contains("CompanySubscriber"))
             {
-                Email.CreateAPICredentials(id);
+                EmailService.CreateAPICredentials(id);
             }
             return _db.GetById(id);
         }
 
-        public void ChangeInfo(int userId, string firstName, string lastName)
+        public T LogIn(string username, string password)
         {
-            T user = _db.GetById(userId);
-            if (ValidationHelper.ValidateString(firstName) == null || ValidationHelper.ValidateString(lastName) == null)
+
+            T userFound = _db.GetAll().SingleOrDefault(x => x.Username == username && x.Password == password);
+            if (userFound == null)
             {
-                MessageHelper.PrintMessage("[Error] strings were not valid. Please try again!", ConsoleColor.Red);
-                Console.ReadLine();
-                return;
+                MessageHelper.PrintMessage("[Error] Username or Password did not match! Please try again!", ConsoleColor.Red);
+                return null;
             }
-            user.FirstName = firstName;
-            user.LastName = lastName;
-            _db.Update(user);
-            MessageHelper.PrintMessage("Data successfuly changed!", ConsoleColor.Green);
-            Console.ReadLine();
+            if (userFound.GetType().ToString().Contains("CompanySubscriber"))
+            {
+                EmailService.CreateAPICredentials(userFound.Id);
+            }
+
+            return userFound;
         }
 
-        public void ChangePassword(int userId, string oldPassword, string newPassword)
-        {
-            T user = _db.GetById(userId);
-            if (user.Password != oldPassword)
-            {
-                MessageHelper.PrintMessage("[Error] Old password did not match", ConsoleColor.Red);
-                Console.ReadLine();
-                return;
-            }
-            if (ValidationHelper.ValidateString(newPassword) == null)
-            {
-                MessageHelper.PrintMessage("[Error] New password is not valid", ConsoleColor.Red);
-                Console.ReadLine();
-                return;
-            }
-            user.Password = newPassword;
-            _db.Update(user);
-            MessageHelper.PrintMessage("Password successfuly changed!", ConsoleColor.Green);
-            Console.ReadLine();
-        }
         public bool IsDbEmpty()
         {
             return _db.GetAll() == null || _db.GetAll().Count == 0;
         }
 
+        
     }
 }

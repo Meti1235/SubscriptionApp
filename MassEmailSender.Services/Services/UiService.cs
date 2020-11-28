@@ -8,9 +8,10 @@ namespace MassEmailSender.Services
 {
     public class UiService : IUiService
     {
-        public static ISubscriberService<UserSubscriber> _userSubscribeSrvc = new SubscriberService<UserSubscriber>();
-        public static ISubscriberService<CompanySubscriber> _companySubscribeSrvc = new SubscriberService<CompanySubscriber>();
-        public FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
+        private static FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
+        private static IAccountService<UserSubscriber> _userAccountSrvc = new AccountService<UserSubscriber>();
+        private static IAccountService<CompanySubscriber> _companyAccountSrvc = new AccountService<CompanySubscriber>();
+
         public List<string> MainMenuItems { get; set; }
         public List<string> AccountMenuItems { get; set; }
 
@@ -41,7 +42,7 @@ namespace MassEmailSender.Services
             Console.Clear();
             if (accountChoice == 1)
             {
-                // Change Info
+
                 Console.WriteLine("Enter new First Name:");
                 string firstName = Console.ReadLine();
                 Console.WriteLine("Enter new Last Name:");
@@ -49,20 +50,14 @@ namespace MassEmailSender.Services
                 switch (currentUser.Role)
                 {
                     case SubscriptionType.User:
-                        _userSubscribeSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
+                        _userAccountSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
                         break;
                     case SubscriptionType.Company:
-                        _companySubscribeSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
+                        _companyAccountSrvc.ChangeInfo(currentUser.Id, firstName, lastName);
                         break;
                 }
             }
             else if (accountChoice == 2)
-            {
-                // Check Subscription  
-                Console.WriteLine($"Your subscription is: {currentUser.Role}");
-                Console.ReadLine();
-            }
-            else if (accountChoice == 3)
             {
                 // Change Password
                 Console.WriteLine("Enter old password:");
@@ -72,81 +67,39 @@ namespace MassEmailSender.Services
                 switch (currentUser.Role)
                 {
                     case SubscriptionType.User:
-                        _userSubscribeSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
+                        _userAccountSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
                         break;
                     case SubscriptionType.Company:
-                        _companySubscribeSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
+                        _companyAccountSrvc.ChangePassword(currentUser.Id, oldPass, newPass);
                         break;
                 }
             }
-        }
-        public Subscriber UserRegister() //move this method
-        {
-            int registerChoice = RegisterMenu();
-            SubscriptionType role = (SubscriptionType)registerChoice;
-            switch (role)
+            else if (accountChoice == 3)
             {
-                case SubscriptionType.User:
-                    var newUser = _userSubscribeSrvc.CreateEntity(new UserSubscriber());
-                    var registeredUser = _userSubscribeSrvc.Register(newUser);
-                    return registeredUser;
-
-                case SubscriptionType.Company:
-                    var newCompany = _companySubscribeSrvc.CreateEntity(new CompanySubscriber());
-                    var registeredCompany = _companySubscribeSrvc.Register(newCompany);
-                    return registeredCompany;
+                switch (currentUser.Role)
+                {
+                    case SubscriptionType.User:
+                        _userAccountSrvc.EditDiscription((UserSubscriber)currentUser);
+                        break;
+                    case SubscriptionType.Company:
+                        _companyAccountSrvc.EditDiscription((CompanySubscriber)currentUser);
+                        break;
+                }
             }
-            throw new ApplicationException("This error is not possible");
+            else if (accountChoice == 4)
+            {
+                Console.WriteLine($"Your subscription is: {currentUser.Role}");
+                Console.WriteLine($"Our premium offer is $12.95 a month.");
+                Console.ReadLine();
+            }
         }
-
+ 
         public int PromotionMenue()
         {
             List<string> menuItems = new List<string>() { "Send InApp Promotion", "Send Email Promotion" };
             return ChooseMenu(menuItems);
         }
 
-        public void SendPromotion(Subscriber currentCompany) //move this method
-        {
-            int promotionChoice = PromotionMenue();
-
-            var compamy = (CompanySubscriber)currentCompany;
-
-            if (promotionChoice == 1)
-            {
-                compamy.SendInAppPromotions();
-            }
-            else
-            {
-                _companySubscribeSrvc.SendEmailPromotion();
-            }
-        }
-
-        public Subscriber UserLogIn()  //move this method
-        {
-            int roleChoice = RoleMenu();
-
-            SubscriptionType role = (SubscriptionType)roleChoice;
-
-            Console.Clear();  //refactor this into a menue 
-            Console.WriteLine("Enter username:");
-            string username = Console.ReadLine();
-            Console.WriteLine("Enter password:");
-            string password = Console.ReadLine();
-
-            switch (role)
-            {
-                case SubscriptionType.User:
-                    UserSubscriber _currentUser = _userSubscribeSrvc.LogIn(username, password);
-                    if (_currentUser != null) _currentUser.AddCompaniesAgain();
-                    return _currentUser;
-
-                case SubscriptionType.Company:
-                    CompanySubscriber _currentCompany = _companySubscribeSrvc.LogIn(username, password);
-                    if (_currentCompany != null) _currentCompany.AddSubscribersAgain();
-                    return _currentCompany;
-            }
-            throw new ApplicationException("This error is not possible");
-        }
         public int LogInMenu()
         {
             List<string> menuItems = new List<string>() { "Log In", "Regsiter" };
@@ -171,8 +124,8 @@ namespace MassEmailSender.Services
             switch (role)
             {
                 case SubscriptionType.Company:
+
                     MainMenuItems.Insert(0, "Send Promotions");
-                    MainMenuItems.Insert(0, "Promotion Discription");
                     break;
                 case SubscriptionType.User:
 
@@ -185,16 +138,8 @@ namespace MassEmailSender.Services
 
         public int AccountMenu(SubscriptionType role)
         {
-            AccountMenuItems = new List<string>() { "Change UserName", "Check Subscription", "Change Password" };
+            AccountMenuItems = new List<string>() { "Change UserName", "Change Password", "Edit Discription", "Check Subscription" };
             return ChooseMenu(AccountMenuItems);
-        }
-
-        public void UpgradeToPremium()
-        {
-            Console.Clear();
-            Console.WriteLine("Upgrade to premium to get these features:");
-            Console.WriteLine("* Newsletter in your mail");
-            Console.ReadLine();
         }
 
         public void SubscribeMenue(Subscriber currentUser)
@@ -206,7 +151,7 @@ namespace MassEmailSender.Services
                 for (int i = 0; i < allCompanies.Count; i++)
                 {
                     Console.Write($"{i + 1}) {allCompanies[i].CompanyName} ");
-                    allCompanies[i].Discription();
+                    allCompanies[i].ShowProfileDiscription();
                 }
 
                 int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), allCompanies.Count);
@@ -225,31 +170,10 @@ namespace MassEmailSender.Services
             }
         }
 
-        public int ChooseEntiiesMenu<T>(List<T> entities) where T : IBaseEntity
+        public void WelcomeMenu(Subscriber entity)
         {
             Console.Clear();
-            while (true)
-            {
-                Console.WriteLine("Enter a number to choose one of the following:");
-                for (int i = 0; i < entities.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}) {entities[i].Info()}");
-                }
-                int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), entities.Count);
-                if (choice == -1)
-                {
-                    MessageHelper.PrintMessage("[Error] Input incorrect. Please try again", ConsoleColor.Red);
-                    Console.ReadLine();
-                    continue;
-                }
-                return choice;
-            }
-        }
-
-        public void Welcome(Subscriber entity)
-        {
-            Console.Clear();
-            Console.WriteLine($"Welcome our app {entity.Username}!");
+            Console.WriteLine($"Welcome to our app {entity.FirstName}!");
             switch (entity.Role)
             {
                 case SubscriptionType.User:

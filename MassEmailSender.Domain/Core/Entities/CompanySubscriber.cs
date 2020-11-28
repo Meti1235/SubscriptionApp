@@ -9,7 +9,6 @@ namespace MassEmailSender.Domain.Core.Entities
         public string CompanyName { get; set; }
         public List<string> SuggestionBox { get; set; }
         public List<string> SubscribedEmails { get; set; }
-        public string PromotionText { get; set; }
 
         public CompanySubscriber()
         {
@@ -17,25 +16,21 @@ namespace MassEmailSender.Domain.Core.Entities
             SuggestionBox = new List<string>();
             SubscribedEmails = new List<string>();
             IdSubscriptionList = new List<int>();
-            PromotionText = null;
+            ProfileDiscription = null;
         }
 
-        public override string Info()
+        public override string ShowProfileDiscription()
         {
-            return $"{FirstName} {LastName} created a profile for {CompanyName}";
-        }
-        public void Discription()
-        {
-            if (PromotionText != null)
+            if (ProfileDiscription != null)
             {
-                Console.WriteLine(PromotionText);
+                return ProfileDiscription;
             }
             else
             {
-                Console.WriteLine($"(Here at {CompanyName} we provide the latest and best {CurrentProduct}!)");
+                return $"(Here at {CompanyName} we provide the latest and best {CurrentProduct}!)";
             }
         }
-        public void ReadSuggestions()
+        public void ReadSuggestions() //future implementation
         {
             Console.WriteLine($"Suggestions for {CompanyName}: ");
             foreach (string suggestion in SuggestionBox)

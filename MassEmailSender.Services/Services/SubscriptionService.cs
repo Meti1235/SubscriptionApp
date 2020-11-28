@@ -5,44 +5,29 @@ using System.Collections.Generic;
 namespace MassEmailSender.Services
 {
 
-    public static class Subscribe
+    public static class SubscriptionService
     {
-        public static IUiService _uiSrvc = new UiService();
-        private static FileSystemDb<CompanySubscriber> companyDB = new FileSystemDb<CompanySubscriber>();
-        private static FileSystemDb<UserSubscriber> userDB = new FileSystemDb<UserSubscriber>();
+        private static FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
+        private static FileSystemDb<UserSubscriber> _userDB = new FileSystemDb<UserSubscriber>();
 
-        public static void AddSubscribersAgain(this CompanySubscriber currentCompany)    //create 1 method for both
+        public static void AddSubscriptionsAgain(this CompanySubscriber currentCompany)  
         {
 
             foreach (int subscriberID in currentCompany.IdSubscriptionList)
             {
-                UserSubscriber subscriber = userDB.GetById(subscriberID);
+                UserSubscriber subscriber = _userDB.GetById(subscriberID);
                 subscriber.SubscribesForPromotion(currentCompany);
 
             }
         }
-        public static void AddCompaniesAgain(this UserSubscriber currentUser)     //create 1 method for both
+        public static void AddSubscriptionsAgain(this UserSubscriber currentUser)   
         {
-            foreach (int companiesID in currentUser.IdSubscriptionList) //map or third method
+            foreach (int companiesID in currentUser.IdSubscriptionList) 
             {
-                CompanySubscriber company = companyDB.GetById(companiesID);
+                CompanySubscriber company = _DbCompany.GetById(companiesID);
                 currentUser.SubscribesForPromotion(company);
             }
         }
-
-        public static void EditDiscription(this Subscriber currentCompany)
-        {
-            Console.WriteLine("Edit your Discription:");
-            var company = (CompanySubscriber)currentCompany;
-            string discription = Console.ReadLine();
-
-            company.PromotionText = $"({discription})";
-            companyDB.Update(company);
-            Console.Clear();
-            Console.WriteLine("Discription Updated.");
-            Console.ReadLine();
-        }
-
 
         public static void MySusbscriptionList(this Subscriber currentUser)
         {
@@ -51,10 +36,10 @@ namespace MassEmailSender.Services
             Console.WriteLine("Your company subcriptions: ");
             foreach (int companiesID in currentUser.IdSubscriptionList)
             {
-                CompanySubscriber company = companyDB.GetById(companiesID);
+                CompanySubscriber company = _DbCompany.GetById(companiesID);
                 companyList.Add(company);
                 Console.Write($"{company.CompanyName}");
-                company.Discription();
+                company.ShowProfileDiscription();
             }
             Console.ReadLine();
 
@@ -69,12 +54,12 @@ namespace MassEmailSender.Services
             if (!company.IdSubscriptionList.Contains(user.Id))
             {
                 company.IdSubscriptionList.Add(user.Id);
-                companyDB.Update(company);
+                _DbCompany.Update(company);
             }
             if (!user.IdSubscriptionList.Contains(company.Id))
             {
                 user.IdSubscriptionList.Add(company.Id);
-                userDB.Update(user);
+                _userDB.Update(user);
             }
             company.SubscribedEmails.Add(user.Email);
             Console.ReadLine();
@@ -88,16 +73,15 @@ namespace MassEmailSender.Services
             if (company.IdSubscriptionList.Contains(user.Id))
             {
                 company.IdSubscriptionList.Remove(user.Id);
-                companyDB.Update(company);
+                _DbCompany.Update(company);
             }
             if (user.IdSubscriptionList.Contains(company.Id))
             {
                 user.IdSubscriptionList.Remove(company.Id);
-                userDB.Update(user);
+                _userDB.Update(user);
             }
             company.SuggestionBox.Add(reason);
             Console.ReadLine();
         }
-
     }
 }

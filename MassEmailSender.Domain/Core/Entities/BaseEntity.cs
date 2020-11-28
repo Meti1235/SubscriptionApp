@@ -1,8 +1,9 @@
-﻿namespace MassEmailSender.Domain.Core.Entities
+﻿
+namespace MassEmailSender.Domain.Core.Entities
 {
-    public abstract class BaseEntity : IBaseEntity
+    public abstract class BaseEntity
     {
         public int Id { get; set; }
-        public abstract string Info();
+        public abstract string ShowProfileDiscription();
     }
 }

@@ -11,17 +11,12 @@ namespace MassEmailSender.Services
         int ChooseMenu<T>(List<T> items);
         List<string> MainMenuItems { get; set; }
         List<string> AccountMenuItems { get; set; }
-        void Welcome(Subscriber user);
-        int ChooseEntiiesMenu<T>(List<T> entities) where T : IBaseEntity;
+        void WelcomeMenu(Subscriber user);
         int MainMenu(SubscriptionType role);
         int AccountMenu(SubscriptionType role);
-        void SubscribeMenue(Subscriber currentUser);
-        void UpgradeToPremium();
-        Subscriber UserLogIn();
-        Subscriber UserRegister();
-        int PromotionMenue();
-        void SendPromotion(Subscriber currentCompany);
         void MyAccountMenue(Subscriber currentUser);
+        void SubscribeMenue(Subscriber currentUser);
+        int PromotionMenue();
 
     }
 }

@@ -9,10 +9,19 @@ namespace MassEmailSender.Domain.Core.Entities
         {
             Role = SubscriptionType.User;
             IdSubscriptionList = new List<int>();
+            ProfileDiscription = null;
         }
-        public override string Info()
+      
+        public override string ShowProfileDiscription() //future implementation
         {
-            return $"{FirstName} {LastName} is a subscriber!";
+            if (ProfileDiscription != null)
+            {
+                return ProfileDiscription; 
+            }
+            else
+            {
+               return $"(Please edit your discription)";
+            }
         }
         public void ReadPromotion(ProductType product)
         {

@@ -10,10 +10,6 @@ namespace MassEmailSender.Services
         T GetUserById(int id);
         IDb<T> GetAll();
         T CreateEntity(T entity);
-        void ChangePassword(int userId, string oldPassword, string newPassword);
-        void ChangeInfo(int userId, string firstName, string lastName);
         bool IsDbEmpty();
-        void SendEmailPromotion();
-        Message WriteEmail();
     }
 }

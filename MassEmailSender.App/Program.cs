@@ -1,6 +1,5 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
 using MassEmailSender.Services;
-using MassEmailSender.Services.GmailAPI;
 using System.Collections.Generic;
 
 namespace MassEmailSender.App
@@ -10,7 +9,7 @@ namespace MassEmailSender.App
     //2. Login to show 2 different layouts //DONE*****
     //3. Subscriber Layout should show all the companies and option for subscribing  //DONE*****
     //4. Company Layout should give them option to edit their product description and  //DONE*****
-    //4.5 Multy Option for sending out advertising to all subscribers DONEish******
+    //4.5 Multy Option for sending out advertising to all subscribers DONE******
     //5. put users and company in a dictionary inside the comapny db so they can auto subscribe when logging in //DONE*****
     //6. add a list of companies which the user is following so they can see all their subscriptions Like 5. above //DONE*****
     //7. fix the broken subscription for new companies //DONE*****
@@ -23,8 +22,10 @@ namespace MassEmailSender.App
     class Program
     {
         public static IUiService _uiSrvc = new UiService();
+
         public static ISubscriberService<UserSubscriber> _userSubscribeSrvc = new SubscriberService<UserSubscriber>();
         public static ISubscriberService<CompanySubscriber> _companySubscribeSrvc = new SubscriberService<CompanySubscriber>();
+        public static AccountService _accountSrvc = new AccountService();
         public static Subscriber _currentlyLoggedIn;
 
         #region Seed method
@@ -52,48 +53,43 @@ namespace MassEmailSender.App
 
                     if (loginChoice == 1)
                     {
-                        _currentlyLoggedIn = _uiSrvc.UserLogIn();
+                        _currentlyLoggedIn = _accountSrvc.UserLogIn();
                     }
                     else
                     {
-                        _currentlyLoggedIn = _uiSrvc.UserRegister();
+                        _currentlyLoggedIn = _accountSrvc.UserRegister();
 
                     }
                     if (_currentlyLoggedIn == null) continue;
-                    _uiSrvc.Welcome(_currentlyLoggedIn);
+                    _uiSrvc.WelcomeMenu(_currentlyLoggedIn);
                 }
 
                 int mainMenuChoice = _uiSrvc.MainMenu(_currentlyLoggedIn.Role);
                 string mainMenuItem = _uiSrvc.MainMenuItems[mainMenuChoice - 1];
                 switch (mainMenuItem)
                 {
-                    case "Promotion Discription":
-                        _currentlyLoggedIn.EditDiscription();
+                    case "Send Promotions":
+                        _accountSrvc.SendPromotion(_currentlyLoggedIn);
                         break;
                     case "Market Offers":
                         _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
                         break;
-                    case "Send Promotions":
-                        _uiSrvc.SendPromotion(_currentlyLoggedIn);
-                        break;
-                    case "Upgrade to Premium":
-                        _uiSrvc.UpgradeToPremium();
-                        break;
                     case "Your Subscriptions":
                         _currentlyLoggedIn.MySusbscriptionList();
+                        break;
+                    case "Upgrade to Premium":
+                        _accountSrvc.UpgradeToPremium();
                         break;
                     case "Account":
                         _uiSrvc.MyAccountMenue(_currentlyLoggedIn);
                         break;
                     case "Log Out":
                         _currentlyLoggedIn = null;
-                        Email.ClearCredential();
+                        EmailService.ClearCredential();
                         break;
                     default:
                         break;
                 }
-
-
             }
         }
     }
