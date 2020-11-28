@@ -29,19 +29,19 @@ namespace MassEmailSender.Services
             }
         }
 
-        public static void MySusbscriptionList(this Subscriber currentUser)
+        public static List<CompanySubscriber> MySusbscriptionList(this Subscriber currentUser)
         {
             var companyList = new List<CompanySubscriber>();
-            Console.Clear();
-            Console.WriteLine("Your company subcriptions: ");
+            
+            int i = 1;
             foreach (int companiesID in currentUser.IdSubscriptionList)
             {
                 CompanySubscriber company = _DbCompany.GetById(companiesID);
                 companyList.Add(company);
-                Console.Write($"{company.CompanyName}");
-                company.ShowProfileDiscription();
+                Console.WriteLine($"{i} {company.CompanyName} {company.ShowProfileDiscription()}");
+                i++;
             }
-            Console.ReadLine();
+            return companyList;
 
         }
         public static void SubscribesForPromotion(this UserSubscriber user, CompanySubscriber company)

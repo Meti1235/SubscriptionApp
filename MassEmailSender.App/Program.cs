@@ -17,7 +17,7 @@ namespace MassEmailSender.App
     //9. Ask the user if they are sure before sending Promotions(write yes/no)
     //10. Give the option to change products to the users and companies
     //11. Give multiple option for Products
-    //12. Add the Unsubscribe option //HALFDONE*****
+    //12. Add the Unsubscribe option //DONE*****
     //13. Complete the GmailAPI service //HALFDONE*****
     class Program
     {
@@ -75,7 +75,7 @@ namespace MassEmailSender.App
                         _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
                         break;
                     case "Your Subscriptions":
-                        _currentlyLoggedIn.MySusbscriptionList();
+                        _uiSrvc.UnSubscribeMenue(_currentlyLoggedIn);
                         break;
                     case "Upgrade to Premium":
                         _accountSrvc.UpgradeToPremium();

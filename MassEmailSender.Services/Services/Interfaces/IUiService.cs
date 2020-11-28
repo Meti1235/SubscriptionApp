@@ -16,6 +16,7 @@ namespace MassEmailSender.Services
         int AccountMenu(SubscriptionType role);
         void MyAccountMenue(Subscriber currentUser);
         void SubscribeMenue(Subscriber currentUser);
+        void UnSubscribeMenue(Subscriber currentUser);
         int PromotionMenue();
 
     }
