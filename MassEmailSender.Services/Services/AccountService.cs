@@ -1,6 +1,7 @@
 ﻿using MassEmailSender.Domain.Core.Entities;
 using MassEmailSender.Services.Helpers;
 using System;
+using System.Collections.Generic;
 
 namespace MassEmailSender.Services
 {
@@ -13,15 +14,15 @@ namespace MassEmailSender.Services
             _db = new FileSystemDb<T>();
         }
 
-        public void EditDiscription(T entity)
+        public void EditDescription(T entity)
         {
-            Console.WriteLine("Edit your Discription:");
-            string discription = Console.ReadLine();
-            entity.ProfileDiscription = $"({discription})";
+            Console.WriteLine("Edit your Description:");
+            string description = Console.ReadLine();
+            entity.ProfileDescription = $"({description})";
 
             _db.Update(entity);
             Console.Clear();
-            Console.WriteLine("Discription Updated.");
+            Console.WriteLine("Description Updated.");
             Console.ReadLine();
         }
 
@@ -120,20 +121,20 @@ namespace MassEmailSender.Services
         public void UpgradeToPremium()
         {
             Console.Clear();
-            Console.WriteLine("Upgrade to premium to get these features:");
+            Console.WriteLine("Upgrade to premium for only $12.95 a month and get these features:");
             Console.WriteLine("* Newsletter in your mail");
+            Console.WriteLine("* Discount of 10% when purchasing");
+            Console.WriteLine("* Additional inApp features (Custome Emojis, etc) ");
             Console.ReadLine();
         }
 
-        public void SendPromotion(Subscriber currentCompany) //move this method
+        public void SendPromotion(CompanySubscriber currentCompany)
         {
-            int promotionChoice = _uiSrvc.PromotionMenue();
-
-            var compamy = (CompanySubscriber)currentCompany;
+            int promotionChoice = _uiSrvc.PromotionMenu();
 
             if (promotionChoice == 1)
             {
-                compamy.SendInAppPromotions();
+                currentCompany.SendInAppPromotions();
             }
             else
             {

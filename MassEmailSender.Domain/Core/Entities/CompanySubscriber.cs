@@ -16,21 +16,21 @@ namespace MassEmailSender.Domain.Core.Entities
             SuggestionBox = new List<string>();
             SubscribedEmails = new List<string>();
             IdSubscriptionList = new List<int>();
-            ProfileDiscription = null;
+            ProfileDescription = null;
         }
 
-        public override string ShowProfileDiscription()
+        public override string ShowProfileDescription()
         {
-            if (ProfileDiscription != null)
+            if (ProfileDescription != null)
             {
-                return ProfileDiscription;
+                return ProfileDescription;
             }
             else
             {
                 return $"(Here at {CompanyName} we provide the latest and best {CurrentProduct}!)";
             }
         }
-        public void ReadSuggestions() //future implementation
+        public void ReadSuggestions()
         {
             Console.WriteLine($"Suggestions for {CompanyName}: ");
             foreach (string suggestion in SuggestionBox)

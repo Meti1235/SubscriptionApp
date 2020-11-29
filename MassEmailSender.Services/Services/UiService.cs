@@ -8,7 +8,7 @@ namespace MassEmailSender.Services
 {
     public class UiService : IUiService
     {
-        private static FileSystemDb<CompanySubscriber> _DbCompany = new FileSystemDb<CompanySubscriber>();
+        private static FileSystemDb<CompanySubscriber> _companyDb = new FileSystemDb<CompanySubscriber>();
         private static IAccountService<UserSubscriber> _userAccountSrvc = new AccountService<UserSubscriber>();
         private static IAccountService<CompanySubscriber> _companyAccountSrvc = new AccountService<CompanySubscriber>();
 
@@ -36,7 +36,26 @@ namespace MassEmailSender.Services
             }
         }
 
-        public void MyAccountMenue(Subscriber currentUser)
+        public int ChooseMenu(List<CompanySubscriber> items)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter a number to choose one of the following:");
+
+                MessageHelper.PrintCompanyList(items);
+
+                int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), items.Count);
+                if (choice == -1)
+                {
+                    MessageHelper.PrintMessage("[Error] Input incorrect. Please try again.", ConsoleColor.Red);
+                    continue;
+                }
+                return choice;
+            }
+        }
+
+        public void MyAccountMenu(Subscriber currentUser)
         {
             int accountChoice = AccountMenu(currentUser.Role);
             Console.Clear();
@@ -59,7 +78,6 @@ namespace MassEmailSender.Services
             }
             else if (accountChoice == 2)
             {
-                // Change Password
                 Console.WriteLine("Enter old password:");
                 string oldPass = Console.ReadLine();
                 Console.WriteLine("Enter new password:");
@@ -79,22 +97,21 @@ namespace MassEmailSender.Services
                 switch (currentUser.Role)
                 {
                     case SubscriptionType.User:
-                        _userAccountSrvc.EditDiscription((UserSubscriber)currentUser);
+                        _userAccountSrvc.EditDescription((UserSubscriber)currentUser);
                         break;
                     case SubscriptionType.Company:
-                        _companyAccountSrvc.EditDiscription((CompanySubscriber)currentUser);
+                        _companyAccountSrvc.EditDescription((CompanySubscriber)currentUser);
                         break;
                 }
             }
             else if (accountChoice == 4)
             {
                 Console.WriteLine($"Your subscription is: {currentUser.Role}");
-                Console.WriteLine($"Our premium offer is $12.95 a month.");
                 Console.ReadLine();
             }
         }
 
-        public int PromotionMenue()
+        public int PromotionMenu()
         {
             List<string> menuItems = new List<string>() { "Send InApp Promotion", "Send Email Promotion" };
             return ChooseMenu(menuItems);
@@ -118,6 +135,12 @@ namespace MassEmailSender.Services
             return ChooseMenu(menuItems);
         }
 
+        public int AccountMenu(SubscriptionType role)
+        {
+            AccountMenuItems = new List<string>() { "Change Name and Surname", "Change Password", "Edit Description", "Check Subscription" };
+            return ChooseMenu(AccountMenuItems);
+        }
+
         public int MainMenu(SubscriptionType role)
         {
             MainMenuItems = new List<string>() { "Upgrade to Premium", "Account", "Log Out" };
@@ -126,6 +149,7 @@ namespace MassEmailSender.Services
                 case SubscriptionType.Company:
 
                     MainMenuItems.Insert(0, "Send Promotions");
+                    MainMenuItems.Insert(0, "Your Subscribers");
                     break;
                 case SubscriptionType.User:
 
@@ -135,79 +159,6 @@ namespace MassEmailSender.Services
             }
             return ChooseMenu(MainMenuItems);
         }
-
-        public int AccountMenu(SubscriptionType role)
-        {
-            AccountMenuItems = new List<string>() { "Change UserName", "Change Password", "Edit Discription", "Check Subscription" };
-            return ChooseMenu(AccountMenuItems);
-        }
-
-        public void SubscribeMenue(Subscriber currentUser)
-        {
-            while (true)
-            {
-                Console.Clear();
-                List<CompanySubscriber> allCompanies = _DbCompany.GetAll().ToList();
-                for (int i = 0; i < allCompanies.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}) {allCompanies[i].CompanyName} {allCompanies[i].ShowProfileDiscription()} ");
-                }
-
-                int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), allCompanies.Count);
-                if (choice == -1)
-                {
-                    MessageHelper.PrintMessage("[Error] Input incorrect. Please try again.", ConsoleColor.Red);
-                    continue;
-                }
-
-                CompanySubscriber currentCompany = allCompanies[choice - 1];
-
-                var user = (UserSubscriber)currentUser;
-                user.SubscribesForPromotion(currentCompany);
-                Console.Clear();
-                Console.WriteLine("You succesfully Subscribed.");
-                Console.ReadLine();
-                break;
-            }
-        }
-        public void UnSubscribeMenue(Subscriber currentUser)
-        {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("Your company subcriptions: ");
-                List<CompanySubscriber> companySubscriptions = currentUser.MySusbscriptionList();
-
-               
-
-                Console.WriteLine("Would you like to Unsubscribe? ( Y/N )");
-                string question = Console.ReadLine();
-                if (question.ToLower() == "y")
-                {
-                    Console.Clear();
-                    Console.WriteLine("Please choose the company you would like to unsubscribe from");
-                    currentUser.MySusbscriptionList();
-                    int choice = ValidationHelper.ValidateNumber(Console.ReadLine(), companySubscriptions.Count);
-                    if (choice == -1)
-                    {
-                        MessageHelper.PrintMessage("[Error] Input incorrect. Please try again.", ConsoleColor.Red);
-                        continue;
-                    }
-
-                    CompanySubscriber currentCompany = companySubscriptions[choice - 1];
-                    var user = (UserSubscriber)currentUser;
-
-                    Console.WriteLine("Please let us know why you are unsubscribing:");
-                    string reason = Console.ReadLine();
-
-                    user.UnsubscribesForPromotion(currentCompany, reason);
-                    Console.Clear();
-                    Console.WriteLine("You succesfully Unsubscribed.");
-                }
-                if (question.ToLower() == "n") break;
-            }
-        }
-
 
         public void WelcomeMenu(Subscriber entity)
         {
@@ -225,8 +176,111 @@ namespace MassEmailSender.Services
             Console.ReadLine();
         }
 
+        public void SubscribeMenu(UserSubscriber currentUser)
+        {
+            while (true)
+            {
+                Console.Clear();
+                List<CompanySubscriber> allCompanies = _companyDb.GetAll().ToList();
+                List<int> myCompanyIds = currentUser.UsersSusbscriptionList().Select(x => x.Id).ToList();
+
+                List<CompanySubscriber> availableCompanies = new List<CompanySubscriber>();
+                foreach (var company in allCompanies)
+                {
+                    if (!myCompanyIds.Contains(company.Id))
+                    {
+                        availableCompanies.Add(company);
+                    }
+                }
+
+                if (availableCompanies.Count == 0)
+                {
+                    Console.WriteLine("There are no more subscriptions available");
+                    Console.ReadLine();
+                    break;
+                }
+
+                Console.WriteLine("Company subcriptions available:");
+                MessageHelper.PrintCompanyList(availableCompanies);
+
+                Console.WriteLine("Would you like to Subscribe? ( Y/N )");
+                string question = Console.ReadLine();
+
+                if (question.ToLower() == "y")
+                {
+                    Console.Clear();
+
+                    int choice = ChooseMenu(availableCompanies);
+
+                    CompanySubscriber currentCompany = availableCompanies[choice - 1];
+
+                    currentUser.SubscribesForPromotion(currentCompany);
+                    Console.Clear();
+                    Console.WriteLine("You succesfully Subscribed.");
+                    Console.ReadLine();
+                }
+                if (question.ToLower() == "n") break;
+            }
+        }
+
+        public void UnSubscribeMenu(UserSubscriber currentUser)
+        {
+            while (true)
+            {
+                Console.Clear();
+                List<CompanySubscriber> companySubscriptions = currentUser.UsersSusbscriptionList();
+
+                if (companySubscriptions.Count == 0)
+                {
+                    Console.WriteLine("There are no more subscriptions available");
+                    Console.ReadLine();
+                    break;
+                }
+
+                Console.WriteLine("Your company subcriptions: ");
+                MessageHelper.PrintCompanyList(companySubscriptions);
+
+                Console.WriteLine("Would you like to Unsubscribe? ( Y/N )");
+                string question = Console.ReadLine();
+                if (question.ToLower() == "y")
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please choose the company you would like to unsubscribe from");
+
+                    int choice = ChooseMenu(companySubscriptions);
+
+                    CompanySubscriber currentCompany = companySubscriptions[choice - 1];
+
+                    Console.WriteLine("Please let us know why you are unsubscribing:");
+                    string reason = Console.ReadLine();
+
+                    currentUser.UnsubscribesForPromotion(currentCompany, reason);
+                    Console.Clear();
+                    Console.WriteLine("You succesfully Unsubscribed.");
+                }
+                if (question.ToLower() == "n") break;
+            }
+        }
+
+        public void CompanySubscriberListMenue(CompanySubscriber currentCompany)
+        {
+            var userList = currentCompany.CompanysSubscriptionList();
+            Console.Clear();
+            if (userList.Count == 0)
+            {
+                Console.WriteLine("You have no Subscribers");
+            }
+            else
+            {
+                Console.WriteLine("Your current subscribed Users: ");
+                for (int i = 0; i < userList.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}) {userList[i].Username} ({userList[i].ShowProfileDescription()})");
+                    Console.WriteLine(); //space
+                }
+            }
+            Console.ReadLine();
+        }
+
     }
-
-
-
 }

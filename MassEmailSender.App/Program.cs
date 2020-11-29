@@ -4,25 +4,27 @@ using System.Collections.Generic;
 
 namespace MassEmailSender.App
 {
-
-    //1. Registraion for 2 accounts types Subscriber/Company DONE*****
-    //2. Login to show 2 different layouts //DONE*****
-    //3. Subscriber Layout should show all the companies and option for subscribing  //DONE*****
-    //4. Company Layout should give them option to edit their product description and  //DONE*****
-    //4.5 Multy Option for sending out advertising to all subscribers DONE******
-    //5. put users and company in a dictionary inside the comapny db so they can auto subscribe when logging in //DONE*****
-    //6. add a list of companies which the user is following so they can see all their subscriptions Like 5. above //DONE*****
-    //7. fix the broken subscription for new companies //DONE*****
-    //8. create your subscription menue for Users
-    //9. Ask the user if they are sure before sending Promotions(write yes/no)
-    //10. Give the option to change products to the users and companies
-    //11. Give multiple option for Products
-    //12. Add the Unsubscribe option //DONE*****
-    //13. Complete the GmailAPI service //HALFDONE*****
     class Program
     {
-        public static IUiService _uiSrvc = new UiService();
+        #region To Do List
 
+        //1. Registraion for 2 accounts types Subscriber/Company DONE*****
+        //2. Login to show 2 different layouts //DONE*****
+        //3. Subscriber Layout should show all the companies and option for subscribing  //DONE*****
+        //4. Company Layout should give them option to edit their product description and  //DONE*****
+        //4.5 Multy Option for sending out advertising to all subscribers DONE******
+        //5. put users and company in a dictionary inside the comapny db so they can auto subscribe when logging in //DONE*****
+        //6. add a list of companies which the user is following so they can see all their subscriptions Like 5. above //DONE*****
+        //7. fix the broken subscription for new companies //DONE*****
+        //8. create your subscription menu for Users //DONE*****
+        //9. Ask the user if they are sure before sending Promotions(write yes/no) //DONE*****
+        //10. Give the option to change products to the users and companies
+        //11. Give multiple option for Products
+        //12. Add the Unsubscribe option //DONE*****
+        //13. Complete the GmailAPI service //DONE*****
+        #endregion
+
+        public static IUiService _uiSrvc = new UiService();
         public static ISubscriberService<UserSubscriber> _userSubscribeSrvc = new SubscriberService<UserSubscriber>();
         public static ISubscriberService<CompanySubscriber> _companySubscribeSrvc = new SubscriberService<CompanySubscriber>();
         public static AccountService _accountSrvc = new AccountService();
@@ -33,10 +35,11 @@ namespace MassEmailSender.App
         {
             if (_userSubscribeSrvc.IsDbEmpty() && _companySubscribeSrvc.IsDbEmpty())
             {
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muhamed", LastName = "Sakipi", Username = "meti20", Password = "meti123", CurrentProduct = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdSubscriptionList = new List<int> { 4 } });
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muh", LastName = "Sakipi", Username = "meti30", Password = "meti123", CurrentProduct = ProductType.Cosmetics, Email = "sakipi.m@outlook.com", Age = 27, Id = 2 });
-                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Muha", LastName = "Sakipi", Username = "meti40", Password = "meti123", CurrentProduct = ProductType.Electronics, Email = "sakipi.m@outlook.com", Age = 27, Id = 3 });
-                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "TestUser", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscriptionList = new List<int> { 1, 2, 3 } }); ;
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Meti", LastName = "Sakipi", Username = "meti20", Password = "meti123", CurrentProduct = ProductType.Food, Email = "sakipi.m@outlook.com", Age = 27, Id = 1, IdSubscriptionList = new List<int> { 4, 5 }, ProfileDescription = "I am here to eat delicious food." });
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Denis", LastName = "Sakipi", Username = "denis20", Password = "denis123", CurrentProduct = ProductType.Cosmetics, Email = "aurora55@live.com", Age = 27, Id = 2, IdSubscriptionList = new List<int> { 4, 5 }, ProfileDescription = "I am just looking around." });
+                _userSubscribeSrvc.Register(new UserSubscriber() { FirstName = "Artan", LastName = "Zumberi", Username = "artan20", Password = "artan123", CurrentProduct = ProductType.Electronics, Email = "albanian20@live.com", Age = 27, Id = 3, IdSubscriptionList = new List<int> { 4, 5 }, ProfileDescription = "I love shopping." });
+                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MetiCompany", FirstName = "Muhamed", LastName = "Sakipi", Username = "meti22", Password = "meti123", Age = 27, Email = "proshqipe@gmail.com", CurrentProduct = ProductType.Food, Id = 4, IdSubscriptionList = new List<int> { 1, 2, 3 } });
+                _companySubscribeSrvc.Register(new CompanySubscriber() { CompanyName = "MiraxhCorp", FirstName = "Miraxh", LastName = "Sakipi", Username = "miraxh22", Password = "miraxh123", Age = 27, Email = "sakipi.mu@gmail.com", CurrentProduct = ProductType.Electronics, Id = 5, IdSubscriptionList = new List<int> { 1, 2, 3 } });
             }
         }
         #endregion
@@ -45,6 +48,7 @@ namespace MassEmailSender.App
         {
 
             Seed();
+
             while (true)
             {
                 if (_currentlyLoggedIn == null)
@@ -68,20 +72,23 @@ namespace MassEmailSender.App
                 string mainMenuItem = _uiSrvc.MainMenuItems[mainMenuChoice - 1];
                 switch (mainMenuItem)
                 {
+                    case "Your Subscribers":
+                        _uiSrvc.CompanySubscriberListMenue((CompanySubscriber)_currentlyLoggedIn);
+                        break;
                     case "Send Promotions":
-                        _accountSrvc.SendPromotion(_currentlyLoggedIn);
+                        _accountSrvc.SendPromotion((CompanySubscriber)_currentlyLoggedIn);
                         break;
                     case "Market Offers":
-                        _uiSrvc.SubscribeMenue(_currentlyLoggedIn);
+                        _uiSrvc.SubscribeMenu((UserSubscriber)_currentlyLoggedIn);
                         break;
                     case "Your Subscriptions":
-                        _uiSrvc.UnSubscribeMenue(_currentlyLoggedIn);
+                        _uiSrvc.UnSubscribeMenu((UserSubscriber)_currentlyLoggedIn);
                         break;
                     case "Upgrade to Premium":
                         _accountSrvc.UpgradeToPremium();
                         break;
                     case "Account":
-                        _uiSrvc.MyAccountMenue(_currentlyLoggedIn);
+                        _uiSrvc.MyAccountMenu(_currentlyLoggedIn);
                         break;
                     case "Log Out":
                         _currentlyLoggedIn = null;

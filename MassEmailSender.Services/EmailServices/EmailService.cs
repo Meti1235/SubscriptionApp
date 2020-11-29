@@ -14,7 +14,7 @@ namespace MassEmailSender.Services
 {
     public class EmailService : IEmailService
     {
-        private static string[] Scope = { GmailService.Scope.GmailSend /*, GmailService.Scope.GmailModify */ }; //later add multiple options
+        private static string[] Scope = { GmailService.Scope.GmailSend /*, GmailService.Scope.GmailModify */ }; //future implementation Additional Options
 
         private static string ApplicationName = "Gmail API .NET Quickstart";
         private static UserCredential Credential;
@@ -59,14 +59,17 @@ namespace MassEmailSender.Services
             Console.Clear();
             Console.WriteLine("Please enter the Subject:");
             string subject = Console.ReadLine();
-            Console.WriteLine("Please write your Gmail");
-            string emailFrom = ValidationHelper.ValidateEmail(Console.ReadLine());
+
+            //Console.WriteLine("Please write your Email"); //future implementation after building my own Email API
+            //string emailFrom = ValidationHelper.ValidateEmail(Console.ReadLine()); 
+
             Console.WriteLine("Please write the recipient email:");
             string emailTo = ValidationHelper.ValidateEmail(Console.ReadLine());
+
             Console.WriteLine("Please write your message:");
             string body = Console.ReadLine();
 
-            Message message = Email.CreateMessage(subject, body, emailFrom, emailTo);
+            Message message = Email.CreateMessage(subject, body, emailTo);
             return message;
 
         }
@@ -79,18 +82,29 @@ namespace MassEmailSender.Services
             }
             return true;
         }
-        public void SendEmailPromotion() //write email and store email //would you like to send email Yes/No //Yes sends email //No goes back aka opens the saves string again
+        public void SendEmailPromotion() 
         {
             Message message = WriteEmail();
-            bool wasEmailSent = SendEmail(message);
-
-            Console.Clear();
-            if (!wasEmailSent)
+            while (true)
             {
-                Console.WriteLine("Your email was not sent.");
+                Console.WriteLine("Are you sure you want to send this mail? ( Y/N )");
+                string question = Console.ReadLine();
+
+                if (question.ToLower() == "y")
+                {
+                    bool wasEmailSent = SendEmail(message);
+                    Console.Clear();
+                    if (!wasEmailSent)
+                    {
+                        Console.WriteLine("Your email was not sent.");
+                        break;
+                    }
+                    Console.WriteLine("Your email was successfully sent.");
+                    Console.ReadLine();
+                    break;
+                }
+                if (question.ToLower() == "n") break;
             }
-            Console.WriteLine("Your email was successfully sent.");
-            Console.ReadLine();
         }
     }
 }

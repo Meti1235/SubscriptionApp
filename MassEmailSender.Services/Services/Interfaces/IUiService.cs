@@ -14,10 +14,12 @@ namespace MassEmailSender.Services
         void WelcomeMenu(Subscriber user);
         int MainMenu(SubscriptionType role);
         int AccountMenu(SubscriptionType role);
-        void MyAccountMenue(Subscriber currentUser);
-        void SubscribeMenue(Subscriber currentUser);
-        void UnSubscribeMenue(Subscriber currentUser);
-        int PromotionMenue();
+        int PromotionMenu();
+        void MyAccountMenu(Subscriber currentUser);
+        void SubscribeMenu(UserSubscriber currentUser);
+        void UnSubscribeMenu(UserSubscriber currentUser);
+        void CompanySubscriberListMenue(CompanySubscriber currentCompany);
+
 
     }
 }

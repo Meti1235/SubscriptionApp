@@ -17,7 +17,7 @@ namespace MassEmailSender.Domain.Core.Entities
         public SubscriptionType Role { get; set; }
         public ProductType CurrentProduct { get; set; }
         public List<int> IdSubscriptionList { get; set; }
-        public string ProfileDiscription { get; set; }
+        public string ProfileDescription { get; set; }
 
     }
 }

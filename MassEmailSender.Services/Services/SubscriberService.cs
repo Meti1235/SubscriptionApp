@@ -1,6 +1,4 @@
-﻿using Google.Apis.Gmail.v1.Data;
-using MassEmailSender.Domain.Core.Entities;
-using MassEmailSender.Services.GmailAPI;
+﻿using MassEmailSender.Domain.Core.Entities;
 using MassEmailSender.Services.Helpers;
 using System;
 using System.Linq;
@@ -49,11 +47,15 @@ namespace MassEmailSender.Services
             Console.WriteLine("Enter email:");
             entity.Email = Console.ReadLine();
 
+            Console.Clear();
             Console.WriteLine("Enter username:");
             entity.Username = Console.ReadLine();
 
             Console.WriteLine("Enter password:");
             entity.Password = Console.ReadLine();
+
+            Console.WriteLine("Enter a profile description:");
+            entity.ProfileDescription = Console.ReadLine();
 
             Console.Clear();
             Console.WriteLine("Enter your favorite product:");
@@ -72,7 +74,8 @@ namespace MassEmailSender.Services
             if (ValidationHelper.ValidateString(entity.FirstName) == null
             || ValidationHelper.ValidateString(entity.LastName) == null
             || ValidationHelper.ValidateUsername(entity.Username) == null
-            || ValidationHelper.ValidatePassword(entity.Password) == null)
+            || ValidationHelper.ValidatePassword(entity.Password) == null
+            || ValidationHelper.ValidateEmail(entity.Email) == null)
             {
                 MessageHelper.PrintMessage("[Error] Invalid information!", ConsoleColor.Red);
                 return null;
@@ -108,6 +111,5 @@ namespace MassEmailSender.Services
             return _db.GetAll() == null || _db.GetAll().Count == 0;
         }
 
-        
     }
 }
